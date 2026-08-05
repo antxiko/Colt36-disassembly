@@ -23,8 +23,11 @@ suya. Estos 1566 bytes son otra cosa, y por eso están:
 
 - **No son código.** Está medido: usan 60 valores de byte distintos en 1566, y
   no contienen un solo `CALL` ni un solo `RET`. No ejecutan nada.
-- **El juego no los usa.** Está demostrado a partir del tope de scroll del propio
-  programa: nunca llegan a la pantalla, en ninguna partida.
+- **El juego no los enseña nunca.** Ojo al matiz, porque es fácil confundirlo:
+  sí se leen y se copian —la línea 33 se lleva el mapa entero, 2048 bytes, al
+  área de trabajo con un `LDIR`, y estos van dentro—, pero acaban en
+  0xDE00–0xE1FF y la ventana visible del nivel 1 termina en 0xDDFF, un byte
+  antes. Se copian, ocupan memoria toda la partida y no se ven jamás.
 - **No reconstruyen nada.** Son el 4,6 % de la cinta, sin las tablas, sin el
   programa y sin el cargador.
 - **Son el objeto de estudio.** La página de bytes muertos va justamente sobre

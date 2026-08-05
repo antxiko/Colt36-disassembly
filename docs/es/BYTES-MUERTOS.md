@@ -1,6 +1,6 @@
 # Bytes muertos
 
-Un desensamblado no termina cuando el código se entiende: termina cuando cada byte de la cinta tiene dueño. En Colt 36 el reparto cierra al 100% —34 239 bytes de contenido, 34 239 explicados—, pero una parte de ese contenido no la lee nadie. Sumando solo los trozos que se cuentan aquí salen **3263 bytes muertos**; si se añaden los 2048 del área de trabajo y los pellizcos de relleno, son **5456 bytes de 34 239, casi el 16% de la cinta**.
+Un desensamblado no termina cuando el código se entiende: termina cuando cada byte de la cinta tiene dueño. En Colt 36 el reparto cierra al 100% —34 239 bytes de contenido, 34 239 explicados—, pero una parte de ese contenido no llega nunca a la pantalla. Conviene separar dos cosas que es facil confundir: hay bytes que **no lee nadie**, ni una sola instruccion, y hay bytes que **si se leen y se copian pero no se ven jamas**. Los del sobrante de los mapas son de los segundos, y mas abajo se explica exactamente por que. Sumando solo los trozos que se cuentan aquí salen **3263 bytes muertos**; si se añaden los 2048 del área de trabajo y los pellizcos de relleno, son **5456 bytes de 34 239, casi el 16% de la cinta**.
 
 ## Los 297 bytes del área de variables
 
@@ -49,7 +49,7 @@ El área de trabajo del nivel ocupa 0xDA00–0xE1FF y detrás vienen 256 bytes a
 
 Aquí toca decir exactamente qué se sabe y qué no.
 
-**El sobrante de los mapas 1 y 2 (1536 bytes).** Cada decorado es un tablero de 32×64, 2048 bytes, y se copia entero al área de trabajo. Pero esa misma línea 610 pone el tope en 0xDC00 para el nivel 1 y en 0xDE00 para el 2, con lo que la última ventana visible acaba en 0xDDFF y en 0xDFFF: **32 filas y 48 filas**. Lo que queda fuera es, al byte, **0xA400–0xA7FF (1024 B)** y **0xAE00–0xAFFF (512 B)**. Eso está demostrado: el juego no muestra esos bytes jamás.
+**El sobrante de los mapas 1 y 2 (1536 bytes).** Estos no son bytes que nadie toque: **se leen, y se copian**. Cada decorado es un tablero de 32×64, 2048 bytes, y la linea 33 se lo lleva entero al área de trabajo de una sentada, con `HL=&HA000+2048*(N%-1) : DE=&HDA00 : BC=2048` y un `USR2`, que es un `LDIR` pelado. O sea que los 1024 bytes de 0xA400–0xA7FF viajan con los demás y acaban en **0xDE00–0xE1FF**. Pero esa misma línea 610 pone el tope en 0xDC00 para el nivel 1 y en 0xDE00 para el 2, con lo que la última ventana visible acaba en 0xDDFF y en 0xDFFF: **32 filas y 48 filas**. Lo que queda fuera es, al byte, **0xA400–0xA7FF (1024 B)** y **0xAE00–0xAFFF (512 B)**. Y ahí se quedan: la ventana visible acaba en 0xDDFF, **un solo byte antes** de donde empiezan. Se copian, ocupan sitio en memoria durante toda la partida, y no se ven nunca.
 
 ![El decorado completo del nivel 1, EL ALMACÉN](../imagenes/mapa1.png)
 

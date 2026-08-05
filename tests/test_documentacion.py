@@ -397,6 +397,52 @@ class TestElVolcadoPublicado(unittest.TestCase):
             self.assertIn(sha, f.read())
 
 
+class TestSeLeenPeroNoSeVen(unittest.TestCase):
+    """Los 1536 bytes SI se leen y se copian; lo que no pasa es que se vean.
+
+    Este test existe por una correccion que llego de fuera: alguien leyo que en
+    esta pagina habia bytes 'que no lee nadie' y respondio, con razon, que USR2
+    accede a 0xA400. Y es cierto: la linea 33 se lleva el mapa entero de 2048
+    bytes al area de trabajo con un LDIR, y estos van dentro. Lo que no ocurre
+    jamas es que lleguen a la pantalla. Confundir las dos cosas es facil, asi
+    que aqui se fija la diferencia con numeros.
+    """
+
+    @sin_bas
+    def test_la_linea_33_copia_el_mapa_entero_de_2048(self):
+        l33 = lineas_basic()[33]
+        self.assertIn("HL=&HA000+2048*(N%-1)", l33)
+        self.assertIn("DE=&HDA00", l33)
+        self.assertIn("BC=2048", l33)
+        self.assertIn("USR2", l33)
+
+    @sin_cm2
+    def test_usr2_es_un_ldir_pelado(self):
+        """0xE313: coge los tres parametros de 0xD9E1 y hace LDIR."""
+        r = sl(cm2(), 0xE313, 0xE323)
+        self.assertEqual(r[0], 0x2A)                 # ld hl,(nn)
+        self.assertEqual(r[1] | (r[2] << 8), 0xD9E1)  # el contador
+        self.assertEqual(r[13], 0xED)                # ldir
+        self.assertEqual(r[14], 0xB0)
+        self.assertEqual(r[15], 0xC9)                # ret
+
+    def test_los_misteriosos_acaban_en_0xde00_y_la_ventana_para_en_0xddff(self):
+        """La cuenta que lo explica todo: se copian, y se quedan un byte fuera."""
+        destino = 0xDA00 + (0xA400 - 0xA000)
+        self.assertEqual(destino, 0xDE00)
+        # El tope de scroll del nivel 1 es 0xDC00 y la ventana son 512 bytes.
+        ultimo_visible = 0xDC00 + 512 - 1
+        self.assertEqual(ultimo_visible, 0xDDFF)
+        self.assertEqual(destino - ultimo_visible, 1)
+
+    def test_la_documentacion_hace_la_distincion(self):
+        for ruta, frases in ((("es", "BYTES-MUERTOS.md"), ("se leen, y se copian", "no se ven")),
+                             (("DEAD-BYTES.md",), ("are read, and they are copied", "never seen"))):
+            t = doc(*ruta)
+            for f in frases:
+                self.assertIn(f, t, "falta %r en %s" % (f, "/".join(ruta)))
+
+
 class TestLaPistaDeLaDireccion(unittest.TestCase):
     """La mejor pista publicada: el contenido de esos bytes lo dicta la direccion.
 

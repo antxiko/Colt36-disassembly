@@ -1,6 +1,6 @@
 # Dead bytes
 
-A disassembly isn't finished when the code makes sense: it's finished when every byte on the tape has an owner. In Colt 36 the accounting closes at 100% —34,239 bytes of content, 34,239 explained— but part of that content is never read by anything. Counting only the pieces listed here gives **3263 dead bytes**; add the 2048 of the work area and the odd scrap of padding and it comes to **5456 bytes out of 34,239, almost 16% of the tape**.
+A disassembly isn't finished when the code makes sense: it's finished when every byte on the tape has an owner. In Colt 36 the accounting closes at 100% —34,239 bytes of content, 34,239 explained— but part of that content never reaches the screen. Two things are worth keeping apart, because they are easy to confuse: some bytes are **read by nothing at all**, not one instruction, and some **are read and copied but never seen**. The leftovers of the maps are the second kind, and exactly why is explained below. Counting only the pieces listed here gives **3263 dead bytes**; add the 2048 of the work area and the odd scrap of padding and it comes to **5456 bytes out of 34,239, almost 16% of the tape**.
 
 ## The 297 bytes of the variable area
 
@@ -49,7 +49,7 @@ The level's work area occupies 0xDA00–0xE1FF, and behind it come 256 zero byte
 
 Here it's a matter of saying exactly what is known and what isn't.
 
-**The leftovers of maps 1 and 2 (1536 bytes).** Each piece of scenery is a 32×64 board, 2048 bytes, and the whole thing is copied to the work area. But that same line 610 puts the limit at 0xDC00 for level 1 and at 0xDE00 for level 2, so the last visible window ends at 0xDDFF and at 0xDFFF: **32 rows and 48 rows**. What falls outside is, to the byte, **0xA400–0xA7FF (1024 B)** and **0xAE00–0xAFFF (512 B)**. That much is proven: the game never shows those bytes.
+**The leftovers of maps 1 and 2 (1536 bytes).** These are not bytes nothing touches: they **are read, and they are copied**. Each piece of scenery is a 32×64 board, 2048 bytes, and line 33 takes the whole lot to the work area in one go, with `HL=&HA000+2048*(N%-1) : DE=&HDA00 : BC=2048` and a `USR2`, which is a bare `LDIR`. So the 1024 bytes at 0xA400–0xA7FF travel along with the rest and end up at **0xDE00–0xE1FF**. But that same line 610 puts the limit at 0xDC00 for level 1 and at 0xDE00 for level 2, so the last visible window ends at 0xDDFF and at 0xDFFF: **32 rows and 48 rows**. What falls outside is, to the byte, **0xA400–0xA7FF (1024 B)** and **0xAE00–0xAFFF (512 B)**. And there they stay: the visible window ends at 0xDDFF, **a single byte before** they begin. They get copied, they take up memory for the whole game, and they are never seen.
 
 ![The complete scenery of level 1, EL ALMACÉN (the warehouse)](imagenes/mapa1.png)
 
