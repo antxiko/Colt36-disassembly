@@ -24,12 +24,13 @@ Y esto no es cosmético, cambia cómo se juega de verdad. La rutina de disparo, 
 
 Tres comprobaciones. El único reparto que podría llamarla, la línea 640, no la lista: `ON (PS%-200)\8 GOTO 690,700,700,740,700,720,760`. No hay ningún `GOTO`, `GOSUB` ni `THEN` en las 63 líneas que apunte al 730. Y la línea anterior acaba en `GOTO`, así que tampoco se cae en ella por orden. Es el resto de una versión anterior que se quedó dentro.
 
-## Cinco rarezas menores
+## Seis rarezas menores
 
 - **Una errata en la línea 630**: `TR%=T`, por `TR%=T%`. No hace daño, porque la 635 reasigna `TR%` acto seguido y porque MSX-BASIC devuelve cero al leer una variable que no se ha usado antes. Pero la intención era otra.
 - **Al terminar el juego se copia la fuente como si fuera un decorado.** La línea 2000 pone `N%=15` y llama a preparar nivel; allí la línea 33 hace `N%=N%+10*(N%>10)` y, como en MSX-BASIC una comparación cierta vale −1, `N%` queda en 5. La dirección sale de `&HA000+2048*(N%-1)`, o sea 0xC000, que no es el quinto nivel sino la tabla de dibujos: 2048 bytes de tipografía volcados sobre el tablero. No se nota porque se vuelve a la portada y el tablero se recarga antes de jugar.
 - La línea 310 usa la forma de sprite número 8, y solo se cargan ocho formas, de la 0 a la 7. No se ve porque el sprite va a y=200, fuera de la pantalla.
 - El tope izquierdo de la mira es `X%>0` y el paso son 8 píxeles partiendo de 132, así que los valores posibles bajan 132, 124… 12, 4, y desde 4 la condición todavía se cumple: `X%` acaba en −4: la mira se sale media casilla por el borde.
+- **El marcador viene grabado con cinco vidas, y el juego empieza con tres.** En la fila 18, columna 7, el tablero del marcador trae el dibujo 161, que es el dígito grande **5**. La línea 597 escribe encima: `V%=3:VPOKE6727,156+V%`, y 6727 es exactamente esa casilla. Nadie llega a ver el cinco, pero está grabado en la cinta.
 - **La cuarta ficha de nivel del marcador no se borra nunca.** La línea 2010, que hace `D%=6835+2*N%:VPOKED%,0`, solo llega a ejecutarse con `N%` valiendo 2, 3 y 4; con 5 la línea anterior ya ha saltado a la portada.
 
 ## Una línea numerada 65535

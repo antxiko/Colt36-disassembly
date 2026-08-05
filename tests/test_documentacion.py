@@ -524,6 +524,18 @@ class TestLaFichaDeNivelQueNoSeBorra(unittest.TestCase):
     def test_la_formula_es_la_que_esta_en_el_listado(self):
         self.assertIn("D%=6835+2*N%", lineas_basic()[2010])
 
+    @sin_cm2
+    def test_el_marcador_trae_cinco_vidas_y_el_juego_pone_tres(self):
+        marcador = sl(cm2(), 0xD300, 0xD400)
+        # Fila 18 (la 2 del marcador, que empieza en la 16), columna 7.
+        self.assertEqual(marcador[2 * 32 + 7], 161)      # 156 + 5
+        self.assertEqual((6727 - 6144) // 32, 18)
+        self.assertEqual((6727 - 6144) % 32, 7)          # la misma casilla
+
+    @sin_bas
+    def test_la_597_escribe_tres_encima(self):
+        self.assertIn("V%=3:VPOKE6727,156+V%", lineas_basic()[597])
+
 
 class TestElCreditoTapado(unittest.TestCase):
     """Publicamos que el tablero dice LUIGILOPEZ 87 PARA y que la 575 lo tapa."""

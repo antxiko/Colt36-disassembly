@@ -24,12 +24,13 @@ And this isn't cosmetic, it changes how the game actually plays. The firing rout
 
 Three checks. The only dispatch that could call it, line 640, doesn't list it: `ON (PS%-200)\8 GOTO 690,700,700,740,700,720,760`. There is no `GOTO`, `GOSUB` or `THEN` anywhere in the 63 lines that points at 730. And the preceding line ends in a `GOTO`, so you can't fall into it in sequence either. It's the leftover of an earlier version that stayed in.
 
-## Five smaller oddities
+## Six smaller oddities
 
 - **A typo on line 630**: `TR%=T`, for `TR%=T%`. It does no harm, because 635 reassigns `TR%` immediately afterwards and because MSX-BASIC returns zero when reading a variable that has not been used before. But that wasn't the intention.
 - **When the game ends, the character set is copied over the board as if it were scenery.** Line 2000 sets `N%=15` and calls the level-setup routine; there, line 33 does `N%=N%+10*(N%>10)` and, since a true comparison is −1 in MSX-BASIC, `N%` ends up as 5. The address comes out of `&HA000+2048*(N%-1)`, i.e. 0xC000, which isn't the fifth level but the pattern table: 2048 bytes of typeface dumped onto the board. Nobody notices because it returns to the title screen and the board is reloaded before play.
 - Line 310 uses sprite pattern number 8, and only eight patterns are loaded, 0 to 7. You can't see it because the sprite goes to y=200, off the screen.
 - The left-hand limit on the crosshair is `X%>0` and the step is 8 pixels starting from 132, so the run goes 132, 124… 12, 4, and from 4 the condition still holds: `X%` ends up at −4: the crosshair goes half a cell past the edge.
+- **The scoreboard is recorded with five lives, and the game starts with three.** At row 18, column 7, the scoreboard's board carries pattern 161, which is the large digit **5**. Line 597 writes over it: `V%=3:VPOKE6727,156+V%`, and 6727 is exactly that cell. Nobody ever sees the five, but it is on the tape.
 - **The fourth level tile on the status bar is never cleared.** Line 2010, which does `D%=6835+2*N%:VPOKED%,0`, only ever runs with `N%` at 2, 3 and 4; at 5 the previous line has already jumped to the title screen.
 
 ## A line numbered 65535
