@@ -435,6 +435,25 @@ class TestSeLeenPeroNoSeVen(unittest.TestCase):
         self.assertEqual(ultimo_visible, 0xDDFF)
         self.assertEqual(destino - ultimo_visible, 1)
 
+    @sin_bas
+    def test_los_bandidos_se_dibujan_pokeando_el_area_de_trabajo(self):
+        """Por eso hay que restaurar el mapa: el tablero se ensucia jugando."""
+        l = lineas_basic()
+        self.assertIn("BA%=&HDA00", l[605])          # BA% apunta al area de trabajo
+        self.assertIn("POKEBA%,C%", l[700])          # dibuja el bandido
+        self.assertIn("POKEBA%,0", l[720])           # y lo borra con ceros
+        self.assertIn("BA%=&HDA00+PEEK", l[760])     # nuevo escondite, tambien ahi
+
+    @sin_bas
+    def test_el_bandido_que_dispara_no_se_borra_nunca(self):
+        """La 740 lo pinta y de ahi se sale del bucle sin deshacer el POKE."""
+        l = lineas_basic()
+        self.assertIn("POKEBA%,C%", l[740])
+        # De la 740 se cae a la 745, la 746, la 747 y la 749; ninguna borra.
+        for n in (745, 746, 747, 749):
+            self.assertNotIn("POKEBA%,0", l[n], "la linea %d si borraria" % n)
+        self.assertIn("GOTO600", l[749].replace(" ", ""))
+
     def test_la_documentacion_hace_la_distincion(self):
         for ruta, frases in ((("es", "BYTES-MUERTOS.md"), ("se leen, y se copian", "no se ven")),
                              (("DEAD-BYTES.md",), ("are read, and they are copied", "never seen"))):
