@@ -347,6 +347,56 @@ class TestElCartelDelosBytesSinIdentificar(unittest.TestCase):
                 self.assertTrue(cifra in t, "falta %r en %s" % (cifra, "/".join(ruta)))
 
 
+class TestElVolcadoPublicado(unittest.TestCase):
+    """Los 1566 bytes se publican en la web y como fichero. Que sean los de verdad.
+
+    Un volcado hexadecimal escrito en un documento es justo el tipo de cosa que
+    se queda desfasada sin que nadie se entere, y aqui es el objeto entero de la
+    pagina: si el volcado no fuera el de la cinta, lo que se discutiria seria una
+    ficcion.
+    """
+
+    RANGOS = [(0xA400, 0xA800), (0xAE00, 0xB000), (0xE323, 0xE341)]
+
+    def esperado(self):
+        d = cm2()
+        return b"".join(sl(d, a, b) for a, b in self.RANGOS)
+
+    def del_documento(self, *ruta):
+        """Saca los bytes de las lineas 'XXXX  AA BB CC ...' del documento."""
+        out = bytearray()
+        for ln in doc(*ruta).splitlines():
+            m = re.match(r"^([0-9A-F]{4})  ((?:[0-9A-F]{2} ?)+)$", ln.strip())
+            if m:
+                out += bytes.fromhex(m.group(2).replace(" ", ""))
+        return bytes(out)
+
+    @sin_cm2
+    def test_el_volcado_de_la_pagina_es_el_binario(self):
+        for ruta in (("es", "BYTES-MUERTOS.md"), ("DEAD-BYTES.md",)):
+            with self.subTest(doc="/".join(ruta)):
+                publicado = self.del_documento(*ruta)
+                self.assertEqual(len(publicado), 1566)
+                self.assertEqual(publicado, self.esperado())
+
+    @sin_cm2
+    def test_el_fichero_del_repositorio_es_el_binario(self):
+        ruta = os.path.join(RAIZ, "datos", "misterio.bin")
+        self.assertTrue(os.path.exists(ruta), "falta datos/misterio.bin")
+        with open(ruta, "rb") as f:
+            self.assertEqual(f.read(), self.esperado())
+
+    def test_el_sha_publicado_es_el_del_fichero(self):
+        import hashlib
+        ruta = os.path.join(RAIZ, "datos", "misterio.bin")
+        if not os.path.exists(ruta):
+            self.skipTest("falta datos/misterio.bin")
+        with open(ruta, "rb") as f:
+            sha = hashlib.sha256(f.read()).hexdigest()
+        with open(os.path.join(RAIZ, "datos", "LEEME.md"), encoding="utf-8") as f:
+            self.assertIn(sha, f.read())
+
+
 class TestLaPistaDeLaDireccion(unittest.TestCase):
     """La mejor pista publicada: el contenido de esos bytes lo dicta la direccion.
 

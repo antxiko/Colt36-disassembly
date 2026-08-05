@@ -36,7 +36,7 @@ and carries on, because the listings might not correspond. Inside there are
 34 239 bytes of content in five blocks.
 
 Without it you can still do a fair amount. The listings in `src/` are in the
-repository and can simply be read. And of the 46 tests, **18 pass without the
+repository and can simply be read. And of the 49 tests, **18 pass without the
 binary**: the ones that check the game listing against what the documentation
 says —that nobody jumps to line 730, or that the published addresses of the
 machine-code routines are the ones the game declares with `DEFUSR`—. The other 15

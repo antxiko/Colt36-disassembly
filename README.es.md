@@ -46,7 +46,7 @@ nombre y explicación. Existe porque la reproducibilidad no ve los errores de
 interpretación: si unos gráficos se marcaran como código, los bytes seguirían
 saliendo idénticos y el único que mentiría sería el listado.
 
-Y **46 tests**, buena parte de ellos dedicados a comprobar que lo que dice la
+Y **49 tests**, buena parte de ellos dedicados a comprobar que lo que dice la
 documentación es lo que hace el juego.
 
 ## SE BUSCAN 1566 bytes, vivos o muertos
@@ -70,11 +70,14 @@ cinta trae dos zonas identificadas como tal y los sospechosos **no se les
 parecen**: encajan con esa regla al 47,7 %, cuando las otras dan 99,3 % y
 100,0 % y un dato cualquiera da 50 %.
 
-Si te apetece mirarlos, con tu propia cinta son dos órdenes:
+Y para mirarlos no hace falta tener la cinta: **están publicados**, en volcado
+hexadecimal en la propia página y como fichero en
+[`datos/misterio.bin`](datos/misterio.bin). Con tu propia copia, además, los
+regeneras y repites todas las medidas con dos órdenes:
 
 ```sh
 make extract
-make misterio     # los saca a work/ y saca por pantalla todas las medidas
+make misterio     # los saca, los mide, y actualiza datos/misterio.bin
 ```
 
 El cartel completo, con lo descartado y cómo se descartó, está en
@@ -119,6 +122,7 @@ no dependen del binario.
 | `tools/basic_detok.py` | detokeniza y retokeniza MSX-BASIC, byte a byte |
 | `tools/render_niveles.py` | dibuja las pantallas desde los datos del binario |
 | `tools/omsx_juega.tcl` | carga la cinta en openMSX y saca capturas |
+| `datos/misterio.bin` | los 1566 bytes sin identificar, para quien quiera probar |
 | `docs/` | la documentación y la web |
 
 ## Créditos

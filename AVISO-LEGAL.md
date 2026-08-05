@@ -21,6 +21,15 @@ español, y que hoy no está a la venta por ningún canal.
 
 La imagen de cinta (`.tsx`) **no** se distribuye aquí.
 
+Hay una excepción, y conviene explicarla porque es deliberada: `datos/misterio.bin`
+son 1566 bytes tomados de la cinta, y sí están. Son los únicos que este trabajo
+no ha conseguido identificar, y la razón de publicarlos es que sin ellos no se
+puede discutir sobre ellos: la página de bytes muertos va justamente de eso. Son
+el 4,6 % de la cinta, está medido que **no son código** —usan 60 valores de byte
+distintos y no contienen un solo `CALL` ni un solo `RET`— y está demostrado a
+partir del propio programa que **el juego no los enseña nunca**. No ejecutan
+nada, no reconstruyen nada y no sustituyen a la cinta para ningún fin.
+
 Las imágenes de `docs/` no son capturas de pantalla tomadas del juego: se
 generan a partir de los datos del binario con las herramientas del repositorio,
 como parte de la demostración de que el formato está bien entendido.

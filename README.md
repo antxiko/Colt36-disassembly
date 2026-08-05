@@ -47,7 +47,7 @@ explanation. It exists because reproducibility cannot see misinterpretation — 
 graphics were marked as code, the bytes would still come out identical and only
 the listing would lie.
 
-And **46 tests**, many of them dedicated to checking that what the documentation
+And **49 tests**, many of them dedicated to checking that what the documentation
 says is what the game does.
 
 ## WANTED: 1566 bytes, dead or alive
@@ -71,11 +71,14 @@ carries two regions identified as exactly that and the suspects **look nothing
 like them**: they fit that rule at 47.7 %, where the others give 99.3 % and
 100.0 % and any old datum gives 50 %.
 
-If you fancy a look, with your own tape it's two commands:
+And you don't need the tape to look at them: they are **published**, as a hex
+dump on the page itself and as a file in [`datos/misterio.bin`](datos/misterio.bin).
+With your own copy you can also regenerate them and repeat every measurement in
+two commands:
 
 ```sh
 make extract
-make misterio     # extracts them to work/ and prints every measurement
+make misterio     # extracts them, measures them, refreshes datos/misterio.bin
 ```
 
 The full poster, with what has been ruled out and how, is on
@@ -120,6 +123,7 @@ do not depend on the binary.
 | `tools/basic_detok.py` | de-tokenises and re-tokenises MSX-BASIC, byte for byte |
 | `tools/render_niveles.py` | draws the screens from the binary's own data |
 | `tools/omsx_juega.tcl` | loads the tape in openMSX and takes screenshots |
+| `datos/misterio.bin` | the 1566 unidentified bytes, for anyone who wants a go |
 | `docs/` | the documentation and the website |
 
 Note that the source listings and their comments are written in Spanish, as is

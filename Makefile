@@ -200,6 +200,9 @@ web: imagenes
 # docs/es/BYTES-MUERTOS.md.
 misterio: extracted/.stamp
 	@python3 tools/extrae_misterio.py work work
+	@mkdir -p datos
+	@cp work/misterio.bin datos/misterio.bin
+	@echo "  datos/misterio.bin actualizado (el que va en el repositorio)"
 
 clean:
 	rm -rf extracted dump build work/*.raw work/*.bin work/*.json work/*.relleno
