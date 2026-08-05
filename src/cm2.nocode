@@ -1,0 +1,13 @@
+# Zonas de CM2 que son DATOS y por las que el trazador no debe pasar.
+#
+# Hace falta porque el bloque es 98% datos: graficos, mapas y tablas. Sin esto,
+# cualquier semilla que se cuele en los graficos desensambla 18 KB de basura que
+# "parece" codigo, que es justo el error que hace que un desensamblado mienta
+# sin que la comprobacion de reproducibilidad se entere (los bytes no cambian,
+# solo su lectura).
+#
+# Convenio: [inicio, fin) — el extremo derecho NO entra.
+
+0x9CA5 0xE300   # todo lo que hay entre el reproductor y las dos rutinas de copia:
+                # variables, tabla de notas, musica, mapas, graficos y buffers
+0xE323 0xE341   # la cola del bloque, detras del RET de usr2

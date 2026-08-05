@@ -1,0 +1,105 @@
+<title>Findings — Colt 36 (1987)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-TAPE.html">The tape</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html" style=color:var(--tinta)>Findings</a><a href="DEAD-BYTES.html">Dead bytes</a><a href="es/HALLAZGOS.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="findings">Findings</h1>
+<p>Colt 36 isn&#x27;t written in machine code: the whole game is a 63-line MSX-BASIC program, tokenised and recorded on tape as if it were a binary. Of the 18,352 bytes in the data block, only 309 are processor instructions. That has one advantage for anyone taking it apart: you can point at the bugs, line by line. What follows is what turned up when we did, each item with the evidence behind it.</p>
+<h2 id="the-score-is-displayed-multiplied-by-a-hundred">The score is displayed multiplied by a hundred</h2>
+<p>The bottom eight rows of the screen — the status bar — come pre-drawn on the tape and don&#x27;t move during play. On row 22, columns 1 to 6, they carry <b>six</b> zeros. The subroutine that refreshes the score, line 10, writes only <b>four</b> digits:</p>
+<p>10 Q=PT%/1000:VPOKE6849,Q+156: ... :VPOKE6852,Q+156:RETURN</p>
+<p><code>VPOKE</code> writes a byte straight into video memory, and each byte in that area is the pattern number of one cell. Address 6849 is row 22, column 1, and the four writes reach as far as column 4. Columns 5 and 6 keep their factory zero forever. Shooting a bandit is worth twenty points (<code>PT%=PT%+20</code>, line 350) and the screen reads 2000.</p>
+<p><img src="imagenes/nivel1.png" alt="The level 1 status bar, with the six zeros of the score"></p>
+<h2 id="ammunition-isn-t-restocked-when-you-lose-a-life">Ammunition isn&#x27;t restocked when you lose a life</h2>
+<p>Line 599 is <code>M%=40:TI%=0</code>: forty bullets and the bandit counter at zero. The game loop starts at 600. When you lose a life, line 749 does <code>VPOKE 6727,V%+156:GOSUB30:GOTO600</code>. It goes back to 600, not to 599. The forty shots are per level, not per life.</p>
+<p>And this isn&#x27;t cosmetic, it changes how the game actually plays. The firing routine, line 300, opens with <code>IF M%=0THENRETURN</code>: with no bullets, pressing the button does absolutely nothing, not even a sound. Meanwhile the bandit keeps counting, and at step 232 of his phase counter he fires and takes a life off you. If you run out of ammunition with lives to spare, you watch them go one by one and there&#x27;s nothing you can do.</p>
+<h2 id="line-730-is-unreachable">Line 730 is unreachable</h2>
+<p>730 PLAY&quot;ACA&quot;:GOTO 610</p>
+<p>Three checks. The only dispatch that could call it, line 640, doesn&#x27;t list it: <code>ON (PS%-200)\8 GOTO 690,700,700,740,700,720,760</code>. There is no <code>GOTO</code>, <code>GOSUB</code> or <code>THEN</code> anywhere in the 63 lines that points at 730. And the preceding line ends in a <code>GOTO</code>, so you can&#x27;t fall into it in sequence either. It&#x27;s the leftover of an earlier version that stayed in.</p>
+<h2 id="five-smaller-oddities">Five smaller oddities</h2>
+<ul><li><b>A typo on line 630</b>: <code>TR%=T</code>, for <code>TR%=T%</code>. It does no harm, because 635 reassigns <code>TR%</code> immediately afterwards and because MSX-BASIC returns zero when reading a variable that has not been used before. But that wasn&#x27;t the intention.</li><li><b>When the game ends, the character set is copied over the board as if it were scenery.</b> Line 2000 sets <code>N%=15</code> and calls the level-setup routine; there, line 33 does <code>N%=N%+10*(N%&gt;10)</code> and, since a true comparison is −1 in MSX-BASIC, <code>N%</code> ends up as 5. The address comes out of <code>&amp;HA000+2048*(N%-1)</code>, i.e. 0xC000, which isn&#x27;t the fifth level but the pattern table: 2048 bytes of typeface dumped onto the board. Nobody notices because it returns to the title screen and the board is reloaded before play.</li><li>Line 310 uses sprite pattern number 8, and only eight patterns are loaded, 0 to 7. You can&#x27;t see it because the sprite goes to y=200, off the screen.</li><li>The left-hand limit on the crosshair is <code>X%&gt;0</code> and the step is 8 pixels starting from 132, so the run goes 132, 124… 12, 4, and from 4 the condition still holds: <code>X%</code> ends up at −4: the crosshair goes half a cell past the edge.</li><li><b>The fourth level tile on the status bar is never cleared.</b> Line 2010, which does <code>D%=6835+2*N%:VPOKED%,0</code>, only ever runs with <code>N%</code> at 2, 3 and 4; at 5 the previous line has already jumped to the title screen.</li></ul>
+<h2 id="a-line-numbered-65535">A line numbered 65535</h2>
+<p>On tape, the first line of the program carries the number <b>65535</b>, above the maximum MSX-BASIC allows. The 45 bytes of machine code that come with the program write the number <b>4</b> over it just before starting the interpreter. Without that patch the program won&#x27;t run: verified in the emulator by jumping straight to 0x9093, where the <code>GOSUB 20</code> on line 520 aborts with <em>Undefined line number in 520</em>.</p>
+<p>And what that line contains finishes the thought: <code>POKE &amp;HFBB1,1</code>. Address 0xFBB1 is BASROM, the location the system uses to decide whether CTRL+STOP can interrupt. Set to 1, the game can&#x27;t be stopped, and therefore can&#x27;t be listed either.</p>
+<h2 id="a-variable-that-isn-t-the-game-s">A variable that isn&#x27;t the game&#x27;s</h2>
+<p>Between the end of the program and the startup code there are 297 bytes the interpreter overwrites within the first few milliseconds: not one line of the program references a single address in that range. Even so, they tell you how the tape was made.</p>
+<p>At 0x8F60 there are eleven bytes in the exact format of an entry in the interpreter&#x27;s variable table: <code>08</code> (double precision), the letter <code>I</code> with its padding, and eight BCD bytes worth <b>37025</b>. Reproduced byte for byte in the emulator. And they are not merely <em>shaped</em> like a variable table entry: the startup code does <code>ld hl,08f60h / ld (0f6c2h),hl</code>, which sets VARTAB — the interpreter&#x27;s own pointer to the start of the variable table — to precisely that address. Colt 36 can&#x27;t have created it: it uses <code>I%</code>, integer, and never a double <code>I</code>. It&#x27;s what happened to be in the memory of whoever recorded the tape.</p>
+<p>After it come 285 bytes of uninitialised RAM that follow the rule &quot;0xFF if bit 0 of the address matches bit 7, and 0x00 if not&quot; — the power-on contents openMSX documents for several machines — in 282 of the 285. Since the rule depends on the <b>absolute</b> address, it works as a fingerprint: it fits 282 of the 285 (98.9%) if the block sat at 0x8000, and only 226 (79.3%) if it had been at 0x83E8, which is where the tape loads it. On the programmer&#x27;s machine the game already lived at 0x8000; 0x83E8 is a detour to avoid trampling the loader while it loads, and the first thing the startup code does is copy it to its proper place.</p>
+<h2 id="the-bsave-was-made-with-the-game-sitting-on-the-title-screen">The BSAVE was made with the game sitting on the title screen</h2>
+<p>Both copy routines read their parameters from a fixed six-byte block at 0xD9E1: how much, where to and where from. On the tape they are recorded as <code>00 03 / 00 18 / 00 D0</code>, i.e. 768 bytes, destination 6144, source 0xD000. Those are exactly the values on line 572, <code>BC=768:DE=6144:HL=&amp;HD000</code>, the one that paints the title-screen board.</p>
+<p>There&#x27;s a second fingerprint pointing the same way: the 2048 bytes of the work area (0xDA00–0xE1FF) carry an identical, byte-for-byte copy of the level 1 map — verified by comparing the two ranges — and that area is filled in by the program at the start of every level, so there&#x27;s no need to record it. The block wasn&#x27;t assembled cold: it was dumped from an MSX with the game loaded and stopped on the title screen.</p>
+<p><img src="imagenes/portada.png" alt="The game&#x27;s title screen"></p>
+<h2 id="forty-eight-seconds-saved">Forty-eight seconds saved</h2>
+<p><img src="imagenes/carga.png" alt="The loading screen"></p>
+<p>The screen you see while the game loads is just an illustration: it doesn&#x27;t touch the sound chip, it doesn&#x27;t wait and it doesn&#x27;t check anything. What&#x27;s interesting is how it stores the colour. In this screen mode the MSX allows a different pair of colours on <b>each of the eight lines</b> of an 8×8 cell, which comes to 6144 bytes of attributes. Here only one is stored per cell: 768 bytes, which the routine replicates eight times on the fly. The cost is that gradients have to be handled with checkerboard dithering, and it saves 5376 bytes of tape, which at that speed is about 48 seconds less waiting. The painting takes 0.27 s measured in the emulator, with the screen off: the image appears all at once.</p>
+<h2 id="the-credits-read-off-the-binary">The credits, read off the binary</h2>
+<ul><li>The title screen says <b>LUIGILOPEZ 87</b> and <b>MUSICA:GOMINOLAS</b> (music: Gominolas).</li><li>The loading screen is signed <b>CANO</b>, bottom right.</li><li>The block holding the publisher&#x27;s logo is byte for byte the same one that appears on other Topo Soft tapes: it wasn&#x27;t made for this game.</li></ul>
+<p>There is a fourth name in there that never reaches the screen. The board is recorded with the text drawn into it as tile numbers, and decoding it (<code>tile − 60 = ASCII</code>, which is what the print routine on line 15 does in reverse) row 22 reads:</p>
+<pre><code>LUIGILOPEZ.hg.PARA..............     h and g are tiles 164 and 163: the large digits 8 and 7</code></pre>
+<p><b>LUIGILOPEZ 87 PARA</b> — and then the sentence stops. Line 575 writes <code>  MUSICA:GOMINOLAS</code> starting at column 14 of that same row, which lands exactly on top of the <code>PARA</code>. What you actually see is <code>LUIGILOPEZ 87   MUSICA:GOMINOLAS</code>. The credit was rewritten at some point and the leftover of the older one is still sitting there in the board, painted over every single time the title screen comes up.</p>
+<footer><p><em>Colt 36</em> lo publicó Topo Soft en 1987; según los créditos del propio juego, los gráficos son de LuigiLopez y la música de Gominolas, y la pantalla de carga está firmada por Cano. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>

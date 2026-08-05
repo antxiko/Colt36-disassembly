@@ -1,0 +1,99 @@
+<title>Por dónde empezar — Colt 36 (1987)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html" style=color:var(--tinta)>Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="LA-CINTA.html">La cinta</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="BYTES-MUERTOS.html">Bytes muertos</a><a href="../GETTING-STARTED.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="por-donde-empezar">Por dónde empezar</h1>
+<p>Esto es el desensamblado comentado de <em>Colt 36</em> (Topo Soft, MSX, 1987), una galería de tiro de cuatro niveles —EL ALMACÉN, EL CAÑÓN, LA MINA y EL SALOON— publicada en cinta de casete. Explica, byte a byte, qué hay grabado en ella.</p>
+<p><img src="../imagenes/portada.png" alt="La pantalla de título de Colt 36"></p>
+<p>Conviene saber desde el principio lo que condiciona todo lo demás: <b>Colt 36 no está escrito en ensamblador</b>. El juego es un programa MSX-BASIC de 63 líneas, tokenizado (el intérprete no guarda el texto del programa, sino una forma comprimida donde cada palabra clave ocupa un byte). De código Z80 hay 309 bytes —dos rutinas de copia —una a la memoria de vídeo, la otra de RAM a RAM— y un reproductor de música— más los 45 que ponen el intérprete en marcha.</p>
+<h2 id="que-hay-aqui">Qué hay aquí</h2>
+<p><code>src/</code> son los listados publicados; <code>tools/</code> las herramientas que extraen la cinta, desensamblan, dibujan y verifican; <code>tests/</code> las pruebas que contrastan la documentación con el binario; <code>docs/</code> esta documentación y sus imágenes. El <code>Makefile</code> es el punto de entrada. <code>extracted/</code>, <code>work/</code>, <code>dump/</code> y <code>build/</code> los genera <code>make</code> y no van versionados.</p>
+<h2 id="la-cinta-no-esta-aqui">La cinta no está aquí</h2>
+<p>La imagen de cinta <b>no se distribuye</b>: hay que poner la propia, con el nombre <code>colt36.tsx</code> y en la raíz del proyecto. El TSX es un formato de imagen de casete: guarda los bloques tal como se leen del audio. La copia con la que se hizo este trabajo son 34 722 bytes y este sha256:</p>
+<p>4f3090407ff22826a0ce1281908c497396cda972fe10dd0af694330cd62ebe13</p>
+<p>Si falta, <code>make</code> se para y lo explica; si el sha256 no cuadra, avisa y sigue, porque los listados podrían no corresponder. Dentro hay 34 239 bytes de contenido en cinco bloques.</p>
+<p>Sin ella se puede hacer bastante. Los listados de <code>src/</code> van en el repositorio y se leen sin más. Y de los 46 tests, <b>18 pasan sin el binario</b>: los que contrastan el listado del juego con lo que dice la documentación —que a la línea 730 no salta nadie, o que las direcciones publicadas de las rutinas en código máquina son las que el juego declara con <code>DEFUSR</code>—. Los otros 15 se saltan solos indicando por qué.</p>
+<h2 id="que-hace-make">Qué hace <code>make</code></h2>
+<p><code>make</code> extrae los bloques, regenera los listados que salen de las herramientas, pasa el control de presupuesto, ejecuta los tests y termina con tres comprobaciones de reproducibilidad. Necesita Python 3 y <code>pasmo</code>, un ensamblador de Z80 de línea de órdenes.</p>
+<p>El <b>presupuesto</b> contabiliza cada byte de la cinta contra lo que la documentación dice que es: hoy, 34 239 explicados de 34 239. Va aparte porque detecta un fallo que la reproducibilidad no ve: si el trazador tomase gráficos por código, los bytes seguirían siendo los mismos y el binario saldría idéntico, pero el listado estaría mintiendo.</p>
+<p>Las <b>tres comprobaciones de reproducibilidad</b> deciden si todo esto vale algo. Primera: <code>src/colt36.bas</code>, retokenizado, tiene que dar los 3935 bytes del programa original. Segunda: los cuatro listados en ensamblador tienen que dar sus binarios exactos —<code>colt36_arranque.asm</code> 342 bytes, <code>colt36_topo.asm</code> 4254, <code>colt36_scr.asm</code> 7100 y <code>colt36_cm2.asm</code> 18 352—. Tercera: las dos mitades del bloque del juego, concatenadas, sus 4277 bytes.</p>
+<p>Mientras eso esté en verde, cualquier afirmación de la documentación se puede contrastar con el binario, y cualquier cambio de comportamiento al tocar el juego se puede atribuir a lo que se ha tocado y no a un error de lectura. Sin esa comprobación, todo esto sería una opinión sobre un montón de bytes.</p>
+<p>Sueltos: <code>make extract</code>, <code>make test</code>, <code>make clean</code> y <code>make ram</code>, que arranca openMSX con la cinta de verdad y vuelca su RAM al empezar el juego, para compararla con la imagen de memoria que el proyecto reconstruye.</p>
+<h2 id="retokenizar-en-vez-de-reensamblar-y-el-papel-de">Retokenizar en vez de reensamblar, y el papel de <code>#</code></h2>
+<p>En un desensamblado normal la prueba es reensamblar. Aquí, como el juego es BASIC, la equivalente es <b>volver a tokenizar</b>. Y eso plantea un problema: un programa BASIC no admite explicaciones sin cambiar los bytes, porque un <code>REM</code> ocupa sitio en memoria. Harían falta dos ficheros —uno comentado para leer y otro fiel para comprobar—, y el comentado acabaría desfasado. Se evita reservando el carácter <code>#</code> a principio de línea para los comentarios del proyecto: no es sintaxis de MSX-BASIC, el tokenizador lo ignora, y así <b>el fichero publicado es exactamente el que se comprueba</b>. De las 460 líneas de <code>src/colt36.bas</code>, 357 son comentarios nuestros; 40 están en blanco y las 63 restantes son el programa del juego, tal cual.</p>
+<h2 id="los-ficheros-de-src">Los ficheros de <code>src/</code></h2>
+<ul><li>**<code>colt36.bas</code>** — el juego: el programa MSX-BASIC completo, línea a línea, con las explicaciones intercaladas. El documento principal del repositorio.</li><li>**<code>colt36_arranque.asm</code>** — lo que va detrás del programa en el mismo bloque: 297 bytes de área de variables y los 45 de código Z80 que copian el juego a 0x8000, parchean su primera línea y ponen el intérprete en marcha.</li><li>**<code>colt36_cm2.asm</code>** — el almacén: dibujos, decorados, música y las rutinas de apoyo que el BASIC llama con <code>USR</code>.</li><li>**<code>colt36_topo.asm</code>** — el logo animado de la casa, lo primero que se ve al cargar. Byte a byte el mismo bloque que traen otras cintas de Topo Soft.</li><li>**<code>colt36_scr.asm</code>** — la ilustración que se ve mientras carga.</li><li>**<code>*.entries</code>, <code>*.notes</code>, <code>*.nocode</code>** — la entrada de las herramientas: puntos de entrada conocidos, comentarios que se inyectan al generar los listados y los rangos de datos por los que el trazador no debe pasar.</li></ul>
+<h2 id="las-herramientas-que-querras-usar">Las herramientas que querrás usar</h2>
+<p>**<code>tools/basic_detok.py</code>** hace y deshace la tokenización de MSX-BASIC: <code>detok</code> saca el texto de un binario, <code>tok</code> lo convierte de vuelta, <code>check</code> y <code>verify</code> comprueban el viaje de ida y vuelta. Los punteros internos de un programa BASIC son absolutos, así que hay que darle la dirección de carga; aquí, 0x8000.</p>
+<p>**<code>tools/render_niveles.py</code>** reconstruye lo que el juego enseña desde los datos de la cinta, siguiendo las líneas del programa que pintan cada pantalla. No son capturas: es una comprobación. Si el reparto del bloque estuviese mal —si lo que llamamos dibujos fuesen los colores— saldría ruido. Que salgan el título y los cuatro decorados legibles es la prueba más fuerte de que las tablas están donde decimos.</p>
+<p>python3 tools/render_niveles.py work/CM2.raw docs/imagenes</p>
+<p><img src="../imagenes/nivel1.png" alt="El primer nivel, EL ALMACÉN, con su marcador"></p>
+<p><img src="../imagenes/mapa1.png" alt="El decorado entero del mismo nivel, más alto que la pantalla: por ahí se mueve"></p>
+<p>**<code>tools/omsx_juega.tcl</code>** carga la cinta en openMSX, deja el juego funcionando y saca capturas. Cargarla lleva su tiempo —bloques a velocidad normal, sin carga rápida—, así que en cuanto el juego arranca guarda un estado, <code>colt36_arranque</code>, al que se vuelve en un segundo con <code>openmsx -savestate colt36_arranque</code>. Se le indican la cinta y la salida en <code>COLT36_TSX</code> y <code>COLT36_OUT</code>.</p>
+<footer><p><em>Colt 36</em> lo publicó Topo Soft en 1987; según los créditos del propio juego, los gráficos son de LuigiLopez y la música de Gominolas, y la pantalla de carga está firmada por Cano. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>

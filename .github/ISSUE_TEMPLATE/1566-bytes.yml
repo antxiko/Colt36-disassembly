@@ -1,0 +1,75 @@
+name: "Los 1566 bytes / The 1566 bytes"
+description: "Una hipotesis sobre los bytes sin identificar — o una medida que descarte alguna / A hypothesis about the unidentified bytes, or a measurement ruling one out"
+title: "[1566] "
+labels: ["1566-bytes"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por mirarlos. Antes de nada, dos cosas que ahorran tiempo:
+
+        1. Los bytes se sacan de tu propia copia de la cinta con
+           `make extract && python3 tools/extrae_misterio.py work work`.
+        2. Lo que ya se ha descartado, y **con qué medida**, esta en
+           [BYTES-MUERTOS.md](../../blob/main/docs/es/BYTES-MUERTOS.md).
+
+        Lo que hace falta no es la idea sino la medida: que habria que ver si la
+        hipotesis fuese cierta, y que sale al mirarlo. Un «no es X, y esta es la
+        cifra que lo descarta» es un resultado valido y se publica igual.
+
+        ---
+
+        Thanks for looking. Two things that save time first:
+
+        1. Extract the bytes from your own copy of the tape with
+           `make extract && python3 tools/extrae_misterio.py work work`.
+        2. What has already been ruled out, and **with what measurement**, is in
+           [DEAD-BYTES.md](../../blob/main/docs/DEAD-BYTES.md).
+
+        What's needed isn't the idea but the measurement: what you would have to
+        see if the hypothesis were true, and what comes out when you look. A
+        "not X, and here is the figure that rules it out" is a valid result and
+        gets published just the same.
+
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: "Que traes / What you have"
+      options:
+        - "Una hipotesis con su medida / A hypothesis with a measurement"
+        - "Una medida que descarta algo / A measurement ruling something out"
+        - "Los mismos bytes vistos en otro sitio / The same bytes seen elsewhere"
+        - "Otra cosa / Something else"
+    validations:
+      required: true
+
+  - type: textarea
+    id: hipotesis
+    attributes:
+      label: "Que crees que son / What you think they are"
+      placeholder: "Un formato, una CPU, un volcado de algo, restos de otro programa…"
+    validations:
+      required: true
+
+  - type: textarea
+    id: medida
+    attributes:
+      label: "La medida / The measurement"
+      description: "Que habria que ver si tuvieras razon, y que sale al mirarlo. Pega la cifra, el volcado o el codigo que lo produce."
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: trozo
+    attributes:
+      label: "Sobre que trozo / Which chunk"
+      placeholder: "0xA400-0xA7FF, 0xAE00-0xAFFF, 0xE323-0xE340, o los tres"
+
+  - type: checkboxes
+    id: comprobado
+    attributes:
+      label: "Antes de enviar / Before sending"
+      options:
+        - label: "He leido lo ya descartado, y esto no esta ahi / I have read what is already ruled out, and this isn't in it"
+          required: true

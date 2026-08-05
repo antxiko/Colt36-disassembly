@@ -1,0 +1,10 @@
+# SCR: la pantalla que se ve mientras carga el juego.
+#
+# Estas notas no generan el listado -src/colt36_scr.asm esta comentado a mano-
+# sino que declaran el reparto del bloque para el control de presupuesto, que es
+# el que comprueba que no queda ni un byte de la cinta sin asignar.
+
+D 0x9C40 0xB440 dibujos   Los 6144 bytes de la ilustracion, en el orden exacto en que van a la memoria de video. Sin comprimir
+D 0xB440 0xB740 colores   El color, a un byte por celda de 8x8 en vez de por linea: 768 en lugar de 6144. La rutina de pintado replica cada uno ocho veces al vuelo, y eso ahorra unos 48 segundos de carga
+D 0xB740 0xB798 basura    88 bytes que no lee nadie. Siguen la regla de la RAM sin inicializar de un MSX recien encendido, o sea que el BSAVE con que se grabo el bloque cogio un rango mas ancho que los datos. Comprobado en el emulador con un punto de observacion: cero lecturas durante el pintado
+D 0xB7F7 0xB7FC ceros     Cinco ceros hasta el final que declara la cabecera de la cinta

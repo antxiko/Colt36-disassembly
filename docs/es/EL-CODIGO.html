@@ -1,0 +1,104 @@
+<title>Cómo está hecho Colt 36 — Colt 36 (1987)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="LA-CINTA.html">La cinta</a><a href="EL-CODIGO.html" style=color:var(--tinta)>El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="BYTES-MUERTOS.html">Bytes muertos</a><a href="../THE-CODE.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="como-esta-hecho-colt-36">Cómo está hecho Colt 36</h1>
+<p>Colt 36 está escrito en MSX-BASIC. No es un cargador en BASIC que arranca un juego en ensamblador: el juego entero —el bucle principal, la detección de impactos, el marcador, la lógica de los bandidos— son <b>63 líneas de MSX-BASIC</b>, 3935 bytes en forma tokenizada (la representación interna comprimida con la que el intérprete guarda un programa). Es un juego comercial de acción de 1987 y se juega perfectamente. Lo que sigue explica cómo es eso posible.</p>
+<p><img src="../imagenes/portada.png" alt="La pantalla de título"></p>
+<h2 id="el-reparto-del-trabajo">El reparto del trabajo</h2>
+<p>El bloque grande de la cinta, <code>CM2</code>, ocupa 18 352 bytes y es casi todo datos: los dibujos, los cuatro decorados, las melodías, los sprites. De código máquina hay <b>309 bytes</b>, el 1,7 % del bloque, en tres piezas:</p>
+<ul><li><b>USR1</b> (0xE300, 17 bytes) copia un bloque de RAM a la memoria de vídeo llamando a LDIRVM, la rutina de la BIOS —el sistema en ROM de la máquina— que está en 0x005C. Este es el motor gráfico entero del juego. La llaman trece líneas del BASIC.</li><li><b>USR2</b> (0xE313, 16 bytes) es la misma rutina hasta el último momento, donde en lugar de llamar a la BIOS hace un <code>LDIR</code>, la instrucción del Z80 que copia un bloque de memoria a memoria. Se la llama desde <b>un solo sitio</b> del programa: llevar el decorado del nivel al área de trabajo, al empezar cada nivel y otra vez al repetirlo tras perder una vida.</li><li><b>El reproductor de música</b> (0x9B91–0x9CA4, 276 bytes), del que se habla más abajo.</li></ul>
+<p><code>USR3</code> y <code>USR4</code> no son rutinas del juego. La línea 500 las declara como <code>DEFUSR3=&amp;H41</code> y <code>DEFUSR4=&amp;H44</code>: son DISSCR y ENASCR, dos entradas de la BIOS para apagar y encender la pantalla mientras se dibuja.</p>
+<p>A esos 309 bytes hay que sumar 45 más, que viven en el otro bloque y solo se ejecutan una vez, al arrancar.</p>
+<h2 id="el-truco-el-juego-no-dibuja-escribe-numeros-de-casilla">El truco: el juego no dibuja, escribe números de casilla</h2>
+<p>En este modo de pantalla el MSX divide la imagen en 32 × 24 casillas de 8 × 8 píxeles, y lo que hay en la memoria de vídeo no son píxeles sino una tabla de 768 números, uno por casilla, que dice qué dibujo va en cada sitio. Colt 36 mantiene <b>una copia de ese tablero en la RAM normal</b>, a partir de 0xDA00, y trabaja siempre sobre la copia.</p>
+<p>Así, todo el juego se reduce a leer y escribir números:</p>
+<ul><li>**Disparar es un solo <code>PEEK</code>.** La línea 305 hace <code>PI%=PEEK(HL+225+X%\8)</code>, que es la casilla bajo el centro de la mira: siete filas más abajo del origen de la ventana y una columna a la derecha. No hay geometría, ni cajas de colisión, ni recorrer una lista de enemigos.</li><li><b>Acertar es cambiar ese número.</b> Los dibujos 71 a 78 son objetos rompibles que valen de 1 a 8 puntos, y romperlos es escribir el número ocho posiciones más allá, que es su versión rota.</li><li><b>Los bandidos no son sprites.</b> Son bloques de 2 × 2 casillas que el BASIC va escribiendo con cuatro <code>POKE</code> sobre el tablero de memoria, según un contador de fase. Los únicos sprites de verdad —imágenes que el chip de vídeo mueve por su cuenta— son la mira, el fogonazo, la mosca de la portada y los ojos.</li></ul>
+<p>Cuando toca enseñar el resultado, USR1 vuelca de golpe los 512 bytes de la ventana visible (16 filas) a la memoria de vídeo. Escribir 512 bytes uno a uno desde BASIC sería inviable; en código máquina es instantáneo.</p>
+<p><img src="../imagenes/nivel1.png" alt="Nivel 1, EL ALMACÉN, con su marcador"></p>
+<h2 id="los-parametros-en-un-sitio-fijo-y-el-scroll-que-sale-gratis">Los parámetros en un sitio fijo, y el scroll que sale gratis</h2>
+<p>USR1 y USR2 no reciben argumentos. Leen sus tres parámetros de seis posiciones fijas de memoria, 0xD9E1–0xD9E6: cuántos bytes copiar, adónde y desde dónde, cada uno en dos bytes. Quien los deja ahí es la subrutina 20 del BASIC, que parte cada número de 16 bits en parte baja y parte alta a base de dividir entre 256, porque el intérprete no tiene operadores para hacerlo.</p>
+<p>Lo interesante es que <b>ninguna de las dos rutinas actualiza esos parámetros al terminar</b>, y el programa lo aprovecha en los dos sitios donde importa.</p>
+<p>El primero es el scroll vertical. No hay desplazamiento de ningún tipo: en cada vuelta del bucle se vuelca otra vez la ventana entera desde una dirección distinta. Mover el decorado una fila es sumarle 32 a la dirección de origen. Por eso la línea 620 solo reescribe dos bytes —los del origen— y llama a USR1: el cuánto y el adónde siguen puestos de la vuelta anterior. (La mira, por cierto, no sube ni baja: está clavada en la fila 7, y arriba y abajo mueven el decorado.)</p>
+<p>El segundo es la panorámica de la línea 746: cuando el bandido que te dispara queda fuera de la ventana, el programa recorre el decorado hasta él reescribiendo también solo esos dos bytes del origen. Y hay un tercer sitio donde se reaprovecha el mismo origen, aunque ahí el BASIC sí vuelve a pasar por la subrutina 20: la carga de los dibujos. La pantalla se divide en tres bandas de 2048 bytes que pueden tener juegos de dibujos distintos, hasta 768 en total. Las líneas 520, 530 y 535 cambian <b>solo el destino</b> y llaman tres veces a USR1, así que suben el mismo juego de 256 dibujos a las tres bandas. Se renuncia a los 768 posibles y a cambio cualquier casilla vale en cualquier parte de la pantalla, que es justo lo que permite mover el decorado libremente.</p>
+<p><img src="../imagenes/mapa3.png" alt="El decorado completo del nivel 3, LA MINA: 32 columnas por 64 filas"></p>
+<h2 id="el-arranque-y-por-que-el-programa-no-se-puede-listar">El arranque, y por qué el programa no se puede listar</h2>
+<p>El bloque <code>CM1</code> de la cinta son 4277 bytes que se cargan en 0x83E8. Su dirección de arranque, 0x948F, cae en un recolocador de cinco instrucciones que se copia a sí mismo y a todo lo demás 1000 bytes más abajo:</p>
+<p>LD HL,0x83E8 / LD DE,0x8000 / LD BC,0x10B5 / LDIR / JP 0x9088</p>
+<p>Carga en 0x83E8 y no directamente en 0x8000 porque mientras el juego se está cargando quien manda es el cargador de la cinta, que es a su vez un programa BASIC y vive precisamente a partir de 0x8001: cargar encima sería pisar el programa que está ejecutando el <code>BLOAD</code>.</p>
+<p>Ya en su sitio, el arranque de 0x9088 hace tres cosas: copia cinco bytes sobre el principio del programa, apunta VARTAB (0xF6C2, el puntero donde el intérprete construye su tabla de variables) a 0x8F60, y salta a 0x73AC, la rutina del intérprete que empieza a ejecutar.</p>
+<p>Esos cinco bytes son una protección. En la cinta, <b>la primera línea del programa viene numerada 65535</b>, por encima del máximo que MSX-BASIC admite, y el arranque le escribe encima el número 4. Sin ese parche el juego no funciona: comprobado en el emulador saltando por detrás de la copia, el <code>GOSUB 20</code> de la línea 520 aborta con <em>Undefined line number in 520</em>. Quien se lleve el bloque y lo cargue por su cuenta no obtiene un programa listable, sino uno roto.</p>
+<p>Y lo primero que hace esa línea recién numerada remata la idea: <code>POKE &amp;HFBB1,1</code>. Esa posición es BASROM, con la que el sistema decide si CTRL+STOP puede interrumpir. Puesta a 1, el juego ya no se puede parar; y si no se puede parar, no se puede listar.</p>
+<h2 id="la-musica-y-por-que-solo-suena-en-la-portada">La música, y por qué solo suena en la portada</h2>
+<p>El reproductor es mínimo: un byte por canal y por paso, sin duraciones ni envolventes. <code>0xFE</code> significa volver al principio, <code>0xFF</code> silencio, y cualquier otro valor es un número de nota que se dobla y sirve de índice en una tabla de 96 periodos de 16 bits. USR5 inicializa; <b>USR6 toca un solo paso</b> y vuelve. Escribe en el chip de sonido por sus puertos, 0xA0 y 0xA1, en seis bytes, sin pasar por la rutina del sistema.</p>
+<p>Como no hay ningún enganche a la interrupción del vídeo, la música solo avanza si alguien llama a USR6 continuamente, y el único sitio del programa que lo hace es la línea 582, dentro del bucle de la portada. Todo el control de tempo de la canción es el <code>FOR H%=1TO35</code> que va justo detrás. En cuanto empieza la partida nadie vuelve a llamar, y a partir de ahí el sonido sale de los <code>PLAY</code> y <code>SOUND</code> del propio BASIC.</p>
+<p>Un detalle de la tabla de periodos: la primera entrada es un DO1 clavado (32,71 Hz), pero el reproductor no arranca por ahí. Su base está en la séptima entrada, así que la nota 0 de las melodías es un FA#1 y las seis primeras no se alcanzan nunca.</p>
+<h2 id="los-textos-raros-del-listado">Los textos raros del listado</h2>
+<p>Leyendo el programa uno se encuentra cosas como <code>DATA &quot;0000EL0CA[ON&quot;</code> o <code>A$=&quot;00MUSICA^GOMINOLAS&quot;</code>. No son erratas. El juego usa su propio juego de caracteres, y el dibujo de una letra es <b>su código ASCII más 60</b>. De ahí que el <code>&#x27;0&#x27;</code> (48 + 60 = 108) sea el hueco en blanco y haga de espacio, el <code>&#x27;[&#x27;</code> sea la eñe, el <code>&#x27;^&#x27;</code> los dos puntos y el <code>&#x27;_&#x27;</code> la admiración. Las letras <code>j</code>, <code>k</code> y <code>l</code> de la línea 2010 tampoco son letras: son los dibujos de la bala y las dos mitades del icono de bandido con que se repone el marcador. Los dígitos van por su cuenta, con el dibujo 156 más la cifra.</p>
+<footer><p><em>Colt 36</em> lo publicó Topo Soft en 1987; según los créditos del propio juego, los gráficos son de LuigiLopez y la música de Gominolas, y la pantalla de carga está firmada por Cano. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>

@@ -1,0 +1,39 @@
+name: "Algo esta mal / Something is wrong"
+description: "Una afirmacion de la documentacion que no cuadra con el binario / A claim in the documentation that doesn't match the binary"
+title: "[error] "
+labels: ["error"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Este trabajo se sostiene sobre que cada cosa que se afirma se puede
+        contrastar con el binario. Si algo no cuadra, es un fallo y se corrige.
+        Da igual lo pequeno que sea: una cifra mal es una cifra mal.
+
+        This work stands on every claim being checkable against the binary. If
+        something doesn't add up, it's a defect and it gets fixed. However small:
+        a wrong figure is a wrong figure.
+
+  - type: input
+    id: donde
+    attributes:
+      label: "Donde / Where"
+      placeholder: "docs/es/HALLAZGOS.md, la seccion de la puntuacion — o src/colt36.bas linea 350"
+    validations:
+      required: true
+
+  - type: textarea
+    id: dice
+    attributes:
+      label: "Que dice / What it says"
+    validations:
+      required: true
+
+  - type: textarea
+    id: deberia
+    attributes:
+      label: "Que deberia decir, y como lo has comprobado / What it should say, and how you checked"
+      description: "El comando, el volcado o la linea del binario. Si es reproducible, mejor."
+      render: text
+    validations:
+      required: true

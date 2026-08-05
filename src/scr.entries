@@ -1,0 +1,3 @@
+# Puntos de entrada del modulo 'scr' (pantalla de carga).
+# org 0x9C40, arranque el exec de la cabecera BIN de la cinta.
+0xB798  arranque   punto de entrada declarado en la cabecera BIN

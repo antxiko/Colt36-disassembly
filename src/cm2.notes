@@ -1,0 +1,152 @@
+# Anotaciones del bloque CM2 de Colt 36 (org 0x9B91, 18352 bytes).
+#
+# CM2 es el almacen del juego: aqui estan los dibujos, los cuatro decorados, la
+# musica y las cuatro rutinas en codigo maquina que el programa BASIC llama con
+# USR. De los 18352 bytes, solo 309 son codigo: el 1,7 por ciento. Todo lo demas
+# son datos.
+#
+# El bloque se carga en 0x9B91 y se queda donde esta. Su direccion de arranque
+# declarada, 0x9BBA, es un RET: cargarlo no hace nada, que es justo lo que se
+# quiere, porque quien manda es el programa BASIC del otro bloque.
+
+B 0x9B91 ############################################################
+B 0x9B91 EL REPRODUCTOR DE MUSICA
+B 0x9B91 ############################################################
+B 0x9B91 La musica de la portada, que el propio juego acredita a
+B 0x9B91 GOMINOLAS. Es un reproductor minimo: un byte por canal y por
+B 0x9B91 paso, sin duraciones ni envolventes. La duracion la pone quien
+B 0x9B91 llama, y quien llama es el BASIC, con el FOR H%=1TO35 de su
+B 0x9B91 linea 582. No hay ningun enganche a la interrupcion: si el
+B 0x9B91 BASIC deja de llamar, la musica se para. Por eso solo suena en
+B 0x9B91 la portada, y durante la partida el sonido sale de los PLAY y
+B 0x9B91 SOUND del propio programa.
+
+L 0x9B91 usr5   DEFUSR5: prepara el reproductor y el chip de sonido
+C 0x9B92 rebobina: copia los tres punteros de inicio sobre los de lectura
+C 0x9BA4 la tabla de arranque del chip: primer byte = cuantas parejas vienen
+C 0x9BA9 y las va escribiendo: R7=0x3F (todo mudo), y los tres volumenes
+C 0x9BB4 deja la copia en RAM del registro 7 lista para usr6
+C 0x9BBA este RET es la direccion de arranque que declara la cinta: no hace nada
+
+L 0x9BBB usr6   DEFUSR6: toca UN paso de la musica en los tres canales
+B 0x9BBB ------------------------------------------------------------
+B 0x9BBB Los tres canales son el mismo codigo repetido tres veces, sin
+B 0x9BBB bucle: sale mas largo pero se ahorra el indexar los registros.
+B 0x9BBB Por cada canal: apaga su tono, lee el byte que toca, y
+B 0x9BBB   0xFE  -> se acabo la melodia: vuelve al principio y relee
+B 0x9BBB   0xFF  -> silencio: se queda apagado
+B 0x9BBB   otro  -> es un numero de nota: lo dobla, lo usa de indice en
+B 0x9BBB            la tabla de periodos, escribe los dos bytes del tono
+B 0x9BBB            y vuelve a encender el canal
+B 0x9BBB Al final avanza el puntero del canal una posicion.
+C 0x9BBB DEFUSR6 apunta a este NOP; el cuerpo empieza justo detras
+C 0x9BBC ---- canal A ----
+C 0x9BC2 pone el bit del canal A en la copia del registro 7: lo enmudece
+C 0x9BCE la marca de "fin de melodia"
+C 0x9BD9 la marca de "silencio"
+C 0x9BDD un periodo son dos bytes, asi que el numero de nota se dobla
+C 0x9BE3 la base de la tabla de periodos, guardada en RAM
+C 0x9BF7 quita el bit del canal A: vuelve a sonar
+C 0x9C03 avanza el puntero del canal para el paso siguiente
+C 0x9C07 ---- canal B: lo mismo con sus punteros y sus registros ----
+C 0x9C4E ---- canal C ----
+C 0x9C9D vuelve al BASIC, que llamara otra vez en la vuelta siguiente
+
+L 0x9C9F escribe_psg   Escribe el registro A del chip de sonido con el valor C
+B 0x9C9F ------------------------------------------------------------
+B 0x9C9F Va a los puertos del chip directamente, sin pasar por la
+B 0x9C9F rutina del sistema (0x0093), asi que se salta el DI/EI que
+B 0x9C9F esta pone alrededor de la escritura. Es el unico sitio de todo
+B 0x9C9F el bloque que toca esos puertos: en los 18352 bytes no hay
+B 0x9C9F ninguna otra escritura a 0xA0 ni a 0xA1.
+
+D 0x9CA5 0x9CBD variables_musica   Estado del reproductor, ya inicializado desde la cinta: la tabla de arranque del chip (4 parejas), la copia del registro 7, los tres punteros de lectura, la base de la tabla de periodos y los tres punteros de inicio
+D 0x9CBD 0x9D7D tabla_periodos     96 periodos de 16 bits, una escala cromatica completa de ocho octavas, decreciente salvo las dos ultimas entradas, que valen lo mismo porque a esa altura el redondeo a entero ya no distingue un semitono del siguiente. El primero es un DO1 (32,71 Hz) clavado. El reproductor NO empieza por el principio: su base esta en 0x9CC9, la septima entrada, asi que la nota numero 0 de las melodias es un FA#1 y las seis primeras entradas no se pueden alcanzar
+D 0x9D7D 0x9DFE melodia_canal_a    Canal A, 128 pasos y la marca de vuelta al principio. Es el bajo: nota, silencio, nota, silencio
+D 0x9DFE 0x9E7F melodia_canal_b    Canal B, 128 pasos. El acompanamiento
+D 0x9E7F 0xA000 melodia_canal_c    Canal C, 384 pasos, que son exactamente tres vueltas de los otros dos: asi los tres coinciden al repetir, sin desfase. Los ultimos 128 pasos son silencio. El bajo arpegia FA#-LA#-DO# y luego SI-RE#, o sea que la pieza esta en modo mayor, entre FA# y SI
+
+B 0xA000 ############################################################
+B 0xA000 LOS CUATRO DECORADOS
+B 0xA000 ############################################################
+B 0xA000 Cada nivel es un tablero de 32 columnas por 64 filas, 2048
+B 0xA000 bytes, donde cada byte es el numero de dibujo de una casilla.
+B 0xA000 El programa lo copia entero al area de trabajo de 0xDA00 y a
+B 0xA000 partir de ahi va sacando ventanas de 16 filas a la pantalla:
+B 0xA000 eso es todo el scroll del juego.
+B 0xA000
+B 0xA000 Pero los cuatro NO usan sus 2048 bytes. El tope del scroll (la
+B 0xA000 linea 610 del BASIC) deja al nivel 1 en 32 filas y al 2 en 48;
+B 0xA000 solo el 3 y el 4 gastan las 64. Lo que sobra se copia igual,
+B 0xA000 pero no se llega a ver nunca.
+
+D 0xA000 0xA400 nivel_1        EL ALMACEN. 32 filas utiles
+D 0xA400 0xA800 nivel_1_resto  Los 1024 bytes que le sobran al nivel 1. Se copian al area de trabajo pero el tope del scroll impide llegar a verlos. No se ha conseguido identificar de que son: no son mapa, ni dibujos, ni color, ni musica, ni copia de nada de la cinta
+D 0xA800 0xAE00 nivel_2        EL CANON. 48 filas utiles
+D 0xAE00 0xB000 nivel_2_resto  Los 512 que le sobran al nivel 2, byte a byte iguales a la segunda mitad del sobrante del nivel 1: los dos se grabaron desde el mismo sitio sin limpiarlo
+D 0xB000 0xB800 nivel_3        LA MINA. Usa las 64 filas
+D 0xB800 0xC000 nivel_4        EL SALOON. Usa las 64 filas
+
+B 0xC000 ############################################################
+B 0xC000 LOS DIBUJOS
+B 0xC000 ############################################################
+B 0xC000 256 casillas de 8x8. El programa las sube a la pantalla TRES
+B 0xC000 veces, una por cada tercio, porque la rutina de copia no
+B 0xC000 actualiza el puntero de origen al terminar y el BASIC solo le
+B 0xC000 cambia el destino. Renuncia asi a los 768 dibujos distintos
+B 0xC000 que el modo permite, y a cambio tiene un unico juego valido en
+B 0xC000 toda la pantalla, que es lo que hace posible el scroll libre.
+B 0xC000
+B 0xC000 Dentro de esos 256 esta el decorado, dos alfabetos y los cuatro
+B 0xC000 modelos de bandido:
+B 0xC000     71 a 78    objetos que se rompen al dispararles; valen de 1
+B 0xC000                a 8 puntos y se cambian por el de 8 numeros mas
+B 0xC000                alla, que es su version rota
+B 0xC000     108        el hueco en blanco, que en los textos del
+B 0xC000                programa se escribe con un '0'
+B 0xC000     125 a 155  las letras: numero = codigo ASCII + 60. Ahi
+B 0xC000                caen la enye (151), los dos puntos (154) y la
+B 0xC000                admiracion (155)
+B 0xC000     156 a 165  las diez cifras, que van por su cuenta
+B 0xC000     166 a 168  la bala y las dos mitades del icono de bandido
+B 0xC000     174 en adelante  los bandidos, en bloques de 2x2
+B 0xC000     255        la casilla vacia, la mas frecuente del decorado
+
+D 0xC000 0xC800 dibujos        Las formas de las 256 casillas, ocho bytes cada una
+D 0xC800 0xD000 colores        Los colores de esas casillas: tinta y fondo por linea
+D 0xD000 0xD300 pantalla_titulo  Las 24 filas de la portada. El BASIC le anade encima dos rotulos (TOPO SOFTWARE y MUSICA:GOMINOLAS) con su linea 575
+D 0xD300 0xD400 marcador       Las ocho filas de abajo, que no se mueven. Vienen grabadas con VIDAS:5 y con SEIS ceros de puntuacion, pero el programa solo escribe cuatro cifras: por eso la puntuacion se lee multiplicada por cien
+D 0xD400 0xD600 decorado_suelto  Dieciseis filas que dibujan una escena coherente -dos plataformas con botellas verdes y una empalizada larga, con ocho objetos de los que se rompen- pero a las que el programa no hace ninguna referencia: en todo el listado no hay ni una constante entre 0xD400 y 0xD5FF. Un trozo descartado que se quedo en el fichero. Los ultimos 128 bytes son ceros
+D 0xD600 0xD800 fila_en_blanco   32 casillas vacias, que el programa usa para borrar la zona de juego fila a fila antes de anunciar el nivel. Los 480 bytes siguientes son mas de lo mismo y no los usa nadie
+D 0xD800 0xD900 sprites        Los ocho sprites de 16x16: las dos capas de la mira, el fogonazo del disparo, la mosca de la portada y los ojos que la siguen
+D 0xD900 0xD9A0 escondites     Diez escondites por nivel, cuatro bytes cada uno: fila, columna, modelo de bandido y retardo de salida. El programa elige uno al azar cada vez (su linea 760), asi que los 16 bandidos de un nivel salen de estas diez posiciones
+D 0xD9A0 0xD9E0 recorte_olvidado  Copia literal de las formas y los colores de las casillas 170 a 173, que son el primer fotograma del primer modelo de bandido: un fotograma que ni siquiera llega a dibujarse. Nadie lee esto
+D 0xD9E0 0xDA00 parametros     Los seis bytes por los que el BASIC le pasa a las rutinas de copia el cuanto, el adonde y el desde donde. Vienen grabados con los valores de la linea 572, o sea que la cinta se hizo desde una sesion viva parada en la portada
+D 0xDA00 0xE200 area_trabajo   Donde se copia el decorado del nivel en curso, y sobre el que el juego escribe: los bandidos que asoman y los objetos que se rompen. En la cinta trae una copia exacta del nivel 1, poso de la memoria del autor al grabar
+D 0xE200 0xE300 ceros          256 bytes a cero, que solo sirven para que la rutina siguiente caiga en una direccion redonda
+
+B 0xE300 ############################################################
+B 0xE300 LAS DOS RUTINAS DE COPIA
+B 0xE300 ############################################################
+B 0xE300 Son el motor grafico entero del juego, y caben en 33 bytes.
+B 0xE300 Las dos leen sus tres parametros del mismo sitio, 0xD9E1, que
+B 0xE300 es donde los deja la subrutina 20 del BASIC. Ninguna de las
+B 0xE300 dos devuelve nada ni actualiza esos parametros, y de eso el
+B 0xE300 programa saca partido: para el scroll solo reescribe el
+B 0xE300 origen, porque el cuanto y el adonde siguen puestos de antes.
+
+L 0xE300 usr1   DEFUSR1: copia BC bytes de la RAM (HL) a la memoria de video (DE)
+C 0xE30D la rutina del sistema que hace la copia a video
+C 0xE311 dos bytes de relleno hasta la rutina siguiente
+
+D 0xE311 0xE313 relleno   Dos bytes de relleno entre las dos rutinas, para que la segunda empiece en 0xE313
+
+L 0xE313 usr2   DEFUSR2: lo mismo pero de RAM a RAM
+B 0xE313 ------------------------------------------------------------
+B 0xE313 Identica a la de arriba hasta el ultimo momento, donde en vez
+B 0xE313 de llamar al sistema hace un LDIR. Se usa una sola vez en todo
+B 0xE313 el juego: para llevar el decorado del nivel al area de trabajo.
+B 0xE313 Hace falta la copia para que el original quede intacto y se
+B 0xE313 pueda repetir el nivel al perder una vida.
+
+D 0xE323 0xE341 cola_sin_identificar   Los 30 bytes que quedan detras del ultimo RET, hasta el final que declara la cabecera de la cinta. Se leen como quince parejas, con el primer byte siempre 0x16, 0x04 o 0x00. No se ha conseguido identificar que son: no son codigo alcanzable, ni dibujos, ni color, ni mapa, ni musica, y la secuencia no aparece en ningun otro sitio de la cinta ni siquiera cogiendo solo los seis primeros bytes

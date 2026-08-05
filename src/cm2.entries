@@ -1,0 +1,8 @@
+# Puntos de entrada del bloque CM2 (org 0x9B91).
+# Los declara el propio programa BASIC en su linea 500, con DEFUSR, salvo el
+# exec de la cabecera BIN, que apunta a un RET y no hace nada.
+0x9B91  usr5        DEFUSR5: arranca el reproductor de musica
+0x9BBB  usr6        DEFUSR6: toca un paso de la musica
+0x9BBA  exec_bin    el exec de la cabecera BIN: el RET con que acaba usr5
+0xE300  usr1        DEFUSR1: copia de RAM a memoria de video
+0xE313  usr2        DEFUSR2: copia de RAM a RAM

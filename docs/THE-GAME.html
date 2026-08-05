@@ -1,0 +1,101 @@
+<title>The game — Colt 36 (1987)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html" style=color:var(--tinta)>The game</a><a href="THE-TAPE.html">The tape</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html">Findings</a><a href="DEAD-BYTES.html">Dead bytes</a><a href="es/EL-JUEGO.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="the-game">The game</h1>
+<p>COLT 36 is a shooting gallery set in the Wild West. Four stages — <b>EL ALMACÉN</b> (the warehouse), <b>EL CAÑÓN</b> (the canyon), <b>LA MINA</b> (the mine) and <b>EL SALOON</b> (the saloon) — three lives, forty bullets per level and sixteen bandits to gun down in each one before moving on. At the end, depending on how far you got, the game grades you: CHAPUCERO (bungler), REGULARCILLO (so-so), BUENO (good), MUY BUENO (very good) or SHERIFF!!</p>
+<p><img src="imagenes/portada.png" alt="The title screen"></p>
+<p>The title screen is not just an idle picture. What the joystick moves is a fly buzzing around the cowboy in the artwork, and the cowboy&#x27;s eyes track it with damped movement: the fly travels 44 pixels across and the eyes only five, so they follow it without popping out. Press fire and the game starts. The program reads keyboard and joystick at once (<code>STICK(0) OR STICK(1)</code>, <code>STRIG(0) OR STRIG(1)</code>), so either one works.</p>
+<h2 id="the-mechanics-are-not-what-they-look-like">The mechanics are not what they look like</h2>
+<p>Three things are worth understanding before looking at anything else, because none of the three is what you would assume from playing.</p>
+<p><b>The crosshair does not move up or down.</b> It is pinned to row 7 of the screen: its sprite — a 16×16 pixel pattern that the video chip draws on top of the background, here two layers overlaid to give it an outline — always sits at y=52. Up and down move the <b>scenery</b>. Left and right do move the crosshair, eight pixels at a time.</p>
+<p><b>The scroll is not a scroll.</b> The game treats the screen as a board of 32 columns by 24 rows and works on a copy of that board in memory, starting at 0xDA00. The top sixteen rows are the play area and the bottom eight the scoreboard, which does not move. Moving the scenery one row means adding or subtracting 32 from a pointer; and then, on every pass through the loop, <b>the whole 512-byte window is dumped again</b> to the screen from that new address. There is no pixel scrolling anywhere: there is one full dump per frame.</p>
+<p><b>The bandits are not sprites.</b> They are 2×2 tile blocks that the program POKEs onto the board in memory. The only sprites in the game are the crosshair, the muzzle flash, the title-screen fly and the eyes.</p>
+<h2 id="shooting">Shooting</h2>
+<p>All of the game&#x27;s hit detection is <b>a single PEEK</b>:</p>
+<p>PI%=PEEK(HL+225+X%\8)</p>
+<p><code>HL</code> is the tile where the visible area begins; the 225 is seven rows down (7×32) plus one column to the right, which is where the centre of the crosshair falls. The tile number found there is read and the decision made from it. Since the crosshair starts at X%=132 and moves eight at a time, it is always 4 modulo 8, so columns 1 to 31 can be aimed at: column 0 is never reachable.</p>
+<p>If the number is 70 or below, there is nothing worth hitting. Tiles <b>71 to 78</b> are breakable objects: they are worth 1 to 8 points and are replaced by the tile eight numbers further on, which is their broken version — and since that version is already above 78, the same object cannot be cashed in twice. The damage lives in the memory copy, so it lasts until the level is reloaded: lose a life and everything is whole again. A warning for anyone studying the maps: tiles 79 to 86 never appear in the playable part of the four backdrops. The 386 tiles where they do occur — always 80 or 84 — are all in the rows of maps 1 and 2 that the scroll limit never lets you see.</p>
+<p>From 174 upwards are the bandits. The filter has three conditions and each one plugs a different hole: the number has to reach 174, it must not be 255 — the empty tile, the commonest one in the scenery, without whose exception you would score twenty points shooting at thin air — and the bandit must not already be falling.</p>
+<h2 id="the-bandit-cycle">The bandit cycle</h2>
+<p>Each bandit has a phase counter, PS%, which goes up by one per frame. Something only happens on the multiples of eight from 200 onwards:</p>
+<table><tr><th>PS%</th><th>what happens</th></tr><tr><td>208</td><td>the warning sound plays <b>and</b> he pops out, in the same frame</td></tr><tr><td>216, 224</td><td>he animates</td></tr><tr><td>232</td><td><b>he fires and takes a life off you</b></td></tr><tr><td>240</td><td>he drops (only reached here if you hit him)</td></tr><tr><td>248</td><td>he is erased</td></tr><tr><td>256</td><td>his turn is over: another one is picked</td></tr></table>
+<p>You have from PS%=209 to PS%=232 to hit him: <b>twenty-four frames</b>. The 232 counts because your shot is processed before his within the same pass, so hitting him on the very frame he is due to fire still saves you.</p>
+<p>Each bandit model has five 2×2 frames, that is twenty tiles: model 1 takes tiles 174 to 193, model 2 194 to 213, model 3 214 to 233 and model 4 234 to 253. Three frames are for popping out, one for firing and the last for dropping.</p>
+<p>Where they come from is a table at 0xD900: <b>ten hiding places per level, four bytes each</b> — row, column, model and appearance delay, the last one between 188 and 207, that is between 1 and 20 frames of waiting before popping out. One is picked at random, reseeding from the system clock, so a level&#x27;s sixteen bandits come out of those ten spots and some repeat, sometimes twice in a row.</p>
+<p>When they shoot at you there is one welcome touch: if the bandit was outside the visible window, the game pans row by row over to him to show you where the shot came from. And while you play, the eyes on the face presiding over the scoreboard look up, straight ahead or down depending on whether the bandit is above, inside or below what you are looking at: they are the clue to which way to search.</p>
+<h2 id="the-four-backdrops">The four backdrops</h2>
+<p>The four maps are stored as boards of 32 columns by 64 rows, 2048 bytes each, but <b>they are not used whole</b>. The scroll limit leaves level 1 at 32 rows and level 2 at 48; only 3 and 4 use all 64. The levels grow taller as you advance, and the last two are already the same size.</p>
+<table><tr><th></th><th>level</th><th>rows used</th><th>the map, as far as the scroll goes</th></tr><tr><td><img src="imagenes/nivel1.png" alt="EL ALMACÉN"></td><td>1 EL ALMACÉN</td><td>32</td><td><img src="imagenes/mapa1.png" alt=""></td></tr><tr><td><img src="imagenes/nivel2.png" alt="EL CAÑÓN"></td><td>2 EL CAÑÓN</td><td>48</td><td><img src="imagenes/mapa2.png" alt=""></td></tr><tr><td><img src="imagenes/nivel3.png" alt="LA MINA"></td><td>3 LA MINA</td><td>64</td><td><img src="imagenes/mapa3.png" alt=""></td></tr><tr><td><img src="imagenes/nivel4.png" alt="EL SALOON"></td><td>4 EL SALOON</td><td>64</td><td><img src="imagenes/mapa4.png" alt=""></td></tr></table>
+<h2 id="the-scoreboard">The scoreboard</h2>
+<p>Lives are written as a digit. The forty bullets are shown with ten tiles, four bullets per tile, and the sixteen bandits with eight columns in two rows, two per column. The screenshots read VIDAS:5 and six zeros of score because that is how the scoreboard is stored on the tape; as soon as the game starts the program writes the 3 of the three lives over it.</p>
+<p>There are six zeros in the score, but the routine that writes it only puts four digits: the last two columns are left as decoration. Which means <b>the score is displayed multiplied by a hundred</b>. Gunning down a bandit adds 20 and the screen reads 2000.</p>
+<p>The other bug shows up while playing: <b>bullets are not replenished when you lose a life</b>. The forty shots are per level. If you run out, shooting does nothing — not even a sound — you can no longer take anyone down, and whatever lives you have left go one after another with nothing you can do about it.</p>
+<p>The final grade comes from where you got to: falling on level 1 is CHAPUCERO; on level 2, REGULARCILLO; on level 3, BUENO; on level 4, MUY BUENO. Finishing all four is SHERIFF!!</p>
+<footer><p><em>Colt 36</em> lo publicó Topo Soft en 1987; según los créditos del propio juego, los gráficos son de LuigiLopez y la música de Gominolas, y la pantalla de carga está firmada por Cano. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>

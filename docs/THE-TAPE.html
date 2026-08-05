@@ -1,0 +1,102 @@
+<title>The tape — Colt 36 (1987)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-TAPE.html" style=color:var(--tinta)>The tape</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html">Findings</a><a href="DEAD-BYTES.html">Dead bytes</a><a href="es/LA-CINTA.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="the-tape">The tape</h1>
+<p><code>colt36.tsx</code> is 34,722 bytes and its sha256 is <code>4f3090407ff22826a0ce1281908c497396cda972fe10dd0af694330cd62ebe13</code>. Inside are five blocks recorded with the standard MSX tape encoding: no turbo loader, no home-made tape-reading routine, nothing faster than what the machine came with from the factory. It really is slow: from the moment the tape starts playing to the moment the logo animation starts running, 69.7 seconds go by, measured in the emulator.</p>
+<table><tr><th>block</th><th>type</th><th>load</th><th>end</th><th>start</th><th>size</th></tr><tr><td><code>COLT36</code></td><td>ASCII</td><td>—</td><td>—</td><td>—</td><td>256 B</td></tr><tr><td><code>topo</code></td><td>BIN</td><td>0x9470</td><td>0xA50D</td><td>0x9470</td><td>4254 B</td></tr><tr><td><code>scr</code></td><td>BIN</td><td>0x9C40</td><td>0xB7FB</td><td>0xB798</td><td>7100 B</td></tr><tr><td><code>CM2</code></td><td>BIN</td><td>0x9B91</td><td>0xE340</td><td>0x9BBA</td><td>18,352 B</td></tr><tr><td><code>CM1</code></td><td>BIN</td><td>0x83E8</td><td>0x949C</td><td>0x948F</td><td>4277 B</td></tr></table>
+<p>That is 34,239 bytes of content. The <code>CM1</code> block also drags a padding byte of <code>0xFF</code> along behind the data, and with it the tape ends.</p>
+<h2 id="what-a-bin-on-tape-is">What a BIN on tape is</h2>
+<p>Each block is preceded by a sixteen-byte header: ten identical bytes saying what type it is, and six with the name. In <code>COLT36</code> those ten bytes are <code>0xEA</code>, which means &quot;text&quot;; in the other four they are <code>0xD0</code>, which means &quot;binary&quot;.</p>
+<p>A BIN on tape carries nothing resembling a relocation table or a symbol list. The only extra it brings is three two-byte addresses at the start of the data block: <b>load</b>, <b>end</b> and <b>start</b>. <code>BLOAD&quot;cas:&quot;</code> dumps the bytes between the load address and the end address, exactly as they are, untouched; add <code>,R</code> and it jumps to the start address when it finishes. That is all. The block has to know where it is going to land, and if the machine has that memory occupied, so much the worse for the machine.</p>
+<p>The ASCII block works differently: it is a BASIC program saved as plain text, and it is loaded with <code>RUN&quot;cas:&quot;</code>, which reads it and runs it. It takes up exactly 256 bytes because text files on tape are written in records of that size, padded with <code>0x1A</code> until they are full.</p>
+<h2 id="the-loader">The loader</h2>
+<p>The 256 bytes of the first block are 117 of text, one <code>0x1A</code> end-of-file byte and 138 more of padding. The text is this:</p>
+<p>10 COLOR 1,1,1:SCREEN 2 20 BLOAD&quot;cas:&quot;,R 30 BLOAD&quot;cas:&quot;,R 40 CLEAR200,39824! 50 BLOAD&quot;cas:&quot;,R 60 BLOAD&quot;cas:&quot;,R</p>
+<p>Line 10 sets ink, background and border to the same colour — 1 is black — and switches to the 256×192 graphics mode. The screen goes dark. Line 20 brings in <code>topo</code>, the company logo, which runs at its own load address, does its animation and hands control back to BASIC. Line 30 brings in <code>scr</code>, the loading screen, whose start address at 0xB798 paints it in 0.27 seconds: it appears all at once, you never see it being drawn.</p>
+<p><img src="imagenes/carga.png" alt="The Colt 36 loading screen, signed CANO"></p>
+<p>Line 50 brings in <code>CM2</code>, the 18,352 bytes of artwork, scenery and music, and line 60 the game itself.</p>
+<p>That leaves line 40, which is the interesting one. <code>CLEAR200,39824</code> reserves 200 bytes for strings and lowers the interpreter&#x27;s memory ceiling to 39824, that is 0x9B90, exactly one byte below where <code>CM2</code> is going to land. And it cannot go just anywhere. It has to come <b>after</b> line 20, because once the <code>CLEAR</code> has been done the interpreter&#x27;s stack and file buffer move to 0x98A0..0x9B90, which is inside the range of <code>topo</code> (0x9470..0xA50D): the <code>BLOAD</code> on line 20 would be writing over its own stack and over the buffer it reads the tape with. And it has to come <b>before</b> line 60, so that when the game starts the ceiling is already in place and neither the stack nor the strings ever reach the data.</p>
+<h3 id="the-proof-that-it-was-saved-with-save-a">The proof that it was saved with <code>SAVE&quot;,A&quot;</code></h3>
+<p>In <code>39824!</code> there is an exclamation mark nobody typed. In MSX-BASIC an integer only goes up to 32767; 39824 does not fit, so the interpreter stores it as a single-precision number, and when a <code>LIST</code> writes it back out it adds the <code>!</code> suffix that marks that type. In other words: the text on the tape is literally the output of a <code>LIST</code>, and the loader was saved with <code>SAVE&quot;cas:&quot;,A</code> from the interpreter itself — it was not typed by hand in an editor.</p>
+<h2 id="what-overwrites-what">What overwrites what</h2>
+<p>The four binary blocks occupy overlapping ranges, because they arrive and evict each other in turn:</p>
+<ul><li><code>scr</code> overwrites 2254 bytes of <code>topo</code>.</li><li><code>CM2</code> overwrites the whole of <code>scr</code> and another 2429 bytes of <code>topo</code>.</li><li><code>CM1</code>, landing at 0x83E8..0x949C, takes out another 45 bytes of <code>topo</code>.</li></ul>
+<p>Of the logo&#x27;s 4254 bytes, 1780 are left untouched, those from 0x949D to 0x9B90. And 0x9B90 is exactly the ceiling the <code>CLEAR</code> set: what survives of the logo falls precisely in the area the interpreter uses as its stack and string space. The corpse lasts longer than you would think, because the game spends little stack: measured 80 seconds into a game, 1629 of those bytes were still intact, and 893 of them consecutive, from 0x949D to 0x9819.</p>
+<h2 id="an-r-that-starts-nothing">An <code>,R</code> that starts nothing</h2>
+<p>All four <code>BLOAD</code>s carry <code>,R</code>, but the one for <code>CM2</code> sets nothing running. Its start address, 0x9BBA, holds a single byte <code>0xC9</code>, which is the Z80&#x27;s <code>RET</code> instruction: the jump goes in and comes straight back out. That byte is the end of the routine beginning at 0x9B91, the one that initialises the music player.</p>
+<p>And it had to be that way on purpose. <code>BSAVE</code> lets you leave out the start address, but in that case it takes the load address, which here is 0x9B91: the <code>,R</code> would have fired up the music player with the game not yet loaded. Pointing the start address at a <code>RET</code> is how a block of pure data gets along with a loader that always uses <code>,R</code>.</p>
+<h2 id="the-cm1-relocator">The <code>CM1</code> relocator</h2>
+<p>The last block loads at 0x83E8 and its start address is 0x948F. There sit five instructions:</p>
+<p>LD HL,0x83E8 LD DE,0x8000 LD BC,0x10B5 LDIR JP 0x9088</p>
+<p><code>LDIR</code> copies BC bytes from HL to DE: here, all 4277 of the whole block, a thousand bytes further down. Since the destination is below the source, copying forwards never bites its own tail. The routine copies itself too, and when it is done it jumps to 0x9088, which is by then already in place.</p>
+<p>The reason for the whole detour is that the game is an MSX-BASIC program, and on the MSX, BASIC programs live from 0x8001 onwards, which is exactly where <code>CM1</code> has to end up. But while the tape is loading, the program in charge is the loader, which is also BASIC and is also at 0x8001, running the <code>BLOAD</code> on line 60. Loading the game straight into its place would mean writing over the program that is reading the tape. So the block lands a thousand bytes higher up, on free ground, and only comes down to its home once the loader is no longer needed.</p>
+<p>From there on there is no tape left: the 20 bytes at 0x9088 set VARTAB — the pointer where the interpreter builds its variable table — to 0x8F60 and jump to the routine that runs programs. Before that they write five bytes over 0x8000, and that is no small detail: on tape the game&#x27;s first line is numbered 65535, above the maximum MSX-BASIC accepts, and those five bytes renumber it as line 4. Anyone who extracts the <code>CM1</code> block and loads it on their own does not get the game: they get a program that breaks the moment it looks for a line backwards.</p>
+<p><img src="imagenes/portada.png" alt="The Colt 36 title screen"></p>
+<footer><p><em>Colt 36</em> lo publicó Topo Soft en 1987; según los créditos del propio juego, los gráficos son de LuigiLopez y la música de Gominolas, y la pantalla de carga está firmada por Cano. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>
