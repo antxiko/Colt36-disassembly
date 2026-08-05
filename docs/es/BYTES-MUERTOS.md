@@ -65,7 +65,11 @@ Y hay dos descartes que merecen su propia medida, porque cierran de golpe famili
 
 **No son código, de ninguna máquina.** No hace falta ir CPU por CPU: basta con contar cuántos valores de byte distintos usan. Los 1566 usan **60**. Trescientos bytes de código Z80 de esta misma cinta usan **67**, y un programa necesita muchos más conforme crece, porque tiene que nombrar registros, saltos y constantes. La consecuencia es que faltan instrucciones que ningún programa puede no tener: en los 1566 bytes hay **cero `CALL` (0xCD), cero `RET` (0xC9), cero prefijos 0xED, cero `JR`, cero `DJNZ` y cero `LD BC,nn`**. Ninguna. Y como es una cuenta sobre el conjunto de bytes, vale para cualquier alineamiento y para cualquier procesador de ocho bits: si el opcode no está en el bloque, no está en ninguna lectura del bloque.
 
-**No son un dibujo, en ningún ancho.** Aquí la medida es la longitud media de racha: cuántos píxeles seguidos del mismo color hay, leyendo los bits en fila. Un dibujo, por dentado que sea, tiene rachas **más largas** que el azar, porque las cosas dibujadas son continuas. Los bytes de la cinta lo confirman: los dibujos del juego dan **3,91** y el mapa del nivel 1 da **3,82**, contra los **2,00** exactos del azar. Los sospechosos dan **1,63**: alternan *más* que unos bytes aleatorios. Y como la racha horizontal no depende del ancho de la línea, esto descarta a la vez todos los anchos posibles.
+**No son un dibujo, en ningún ancho.** Y aquí conviene explicar una medida que parecía concluyente y no lo es del todo, porque es instructivo. La idea era mirar la longitud media de racha —cuántos píxeles seguidos del mismo color hay, leyendo los bits en fila—: un dibujo, por dentado que sea, tiene rachas **más largas** que el azar, porque las cosas dibujadas son continuas. Los bytes de la cinta lo confirman: los dibujos del juego dan **3,91** y el mapa del nivel 1 da **3,82**, contra los **2,00** exactos del azar. Los sospechosos dan **1,63**, alternando *más* que unos bytes aleatorios.
+
+Pero esa medida sola **no basta**, y hay un contraejemplo claro: un dibujo hecho con **tramado en damero** alterna a cada píxel y también da rachas cortas. Medido sobre un gráfico tramado de verdad, la racha sale en 1,96, casi lo mismo que estos bytes. Así que la racha corta dice «esto no es un dibujo de trazos continuos», no «esto no es un dibujo».
+
+Lo que sí sostiene el descarte es otra cosa: un tramado de verdad usa **muchos valores distintos** —156 en el ejemplo medido—, y estos usan **55**, con las posiciones pares y las impares sin apenas compartir ninguno. Y sobre todo, dibujarlos no produce ninguna figura: se han probado 8, 16 y 32 caracteres de ancho, con y sin la trama restada, desintercalando pares e impares, y como parejas de patrón y color. Sale textura, nunca un dibujo.
 
 **La cola de 30 bytes (0xE323–0xE340).** Van detrás del último `RET`, hasta el final que declara la cabecera:
 
@@ -138,7 +142,9 @@ Esta es la única parte del trabajo que sigue abierta, así que se publica como 
     |                                                             |
     |   NO SON  código de ninguna CPU (60 valores de byte, cero   |
     |           CALL y cero RET en 1566) - dibujo de ningun       |
-    |           ancho (racha 1,63, por debajo del azar 2,00) -    |
+    |           ancho: probados 8, 16 y 32 caracteres, con        |
+    |           y sin trama y desintercalando; sale               |
+    |           textura, nunca una figura) -                      |
     |           mapa - color - música - sonido digitalizado -     |
     |           tabla de notas - copia de otra parte de la cinta  |
     |           - la RAM de encendido que sí trae esta cinta      |

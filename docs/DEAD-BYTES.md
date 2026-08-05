@@ -65,7 +65,11 @@ Two of the exclusions deserve a measurement of their own, because they close off
 
 **They are not code, from any machine.** There is no need to go CPU by CPU: it is enough to count how many distinct byte values they use. The 1566 use **60**. Three hundred bytes of Z80 code from this same tape use **67**, and a program needs far more as it grows, because it has to name registers, jumps and constants. The consequence is that instructions no program can do without are missing: in the 1566 bytes there are **zero `CALL` (0xCD), zero `RET` (0xC9), zero 0xED prefixes, zero `JR`, zero `DJNZ` and zero `LD BC,nn`**. Not one. And since this is a count over the set of bytes, it holds for any alignment and any eight-bit processor: if the opcode isn't in the block, it isn't in any reading of the block.
 
-**They are not a picture, at any width.** Here the measurement is mean run length: how many consecutive pixels of the same colour there are, reading the bits in a row. A picture, however jagged, has runs **longer** than chance, because drawn things are continuous. The tape's own bytes confirm it: the game's patterns give **3.91** and the level 1 map gives **3.82**, against the exact **2.00** of chance. The suspects give **1.63**: they alternate *more* than random bytes do. And since a horizontal run doesn't depend on the line width, this rules out every possible width at once.
+**They are not a picture, at any width.** And here a measurement that looked conclusive turns out not to be, which is worth explaining. The idea was to look at mean run length — how many consecutive pixels of the same colour there are, reading the bits in a row: a picture, however jagged, has runs **longer** than chance, because drawn things are continuous. The tape's own bytes confirm it: the game's patterns give **3.91** and the level 1 map gives **3.82**, against the exact **2.00** of chance. The suspects give **1.63**, alternating *more* than random bytes do.
+
+But that measurement alone is **not enough**, and there is a clear counterexample: a picture drawn with **checkerboard dithering** alternates at every pixel and also gives short runs. Measured on genuinely dithered graphics, the run length comes out at 1.96 — almost the same as these bytes. So a short run says "this is not a picture made of continuous strokes", not "this is not a picture".
+
+What does hold the exclusion up is something else: real dithering uses **many distinct values** — 156 in the case measured — and these use **55**, with the even and odd positions barely sharing any. And above all, drawing them produces no figure at all: 8, 16 and 32 characters wide have been tried, with and without the dither subtracted, de-interleaving even from odd, and as pattern-and-colour pairs. Texture comes out, never a picture.
 
 **The 30-byte tail (0xE323–0xE340).** They sit after the last `RET`, up to the end declared by the header:
 
@@ -137,8 +141,10 @@ This is the one part of the work still open, so it gets published as what it is:
     |       their bits (the scenery next door: 54%)               |
     |                                                             |
     |   NOT  code of any CPU (60 byte values, zero CALL and       |
-    |        zero RET in 1566) - a picture at any width (run      |
-    |        1.63, below chance at 2.00) - map - colour -         |
+    |        zero RET in 1566) - a picture at any width: 8,       |
+    |        16 and 32 wide tried, with and without dither        |
+    |        and de-interleaved; texture comes out, never a       |
+    |        figure) - map - colour -                             |
     |        music - digitised sound - note table - a copy of     |
     |        another part of the tape - the power-on RAM this     |
     |        tape does carry (47.7% fit; the other regions        |
