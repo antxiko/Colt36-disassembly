@@ -35,7 +35,7 @@ porque los listados podrían no corresponder. Dentro hay 34 239 bytes de conteni
 en cinco bloques.
 
 Sin ella se puede hacer bastante. Los listados de `src/` van en el repositorio y
-se leen sin más. Y de los 57 tests, **26 pasan sin el binario**: los que
+se leen sin más. Y de los 58 tests, **26 pasan sin el binario**: los que
 contrastan el listado del juego con lo que dice la documentación —que a la línea
 730 no salta nadie, o que las direcciones publicadas de las rutinas en código
 máquina son las que el juego declara con `DEFUSR`—. Los otros 15 se saltan solos

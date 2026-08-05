@@ -510,6 +510,32 @@ class TestLaPistaDeLaDireccion(unittest.TestCase):
         self.assertAlmostEqual(encaje(sl(d, 0xA000, 0xA400), 0xA000), 50.3, places=1)
 
     @sin_cm2
+    def test_no_son_una_tabla_de_escondites_de_bandidos(self):
+        """Con la tabla de verdad del juego como patron de medida.
+
+        Es la sospecha mas natural viendo donde caen, asi que conviene tenerla
+        clavada: una entrada solo vale si los CUATRO campos son posibles a la
+        vez. La tabla autentica de 0xD900 da 40 de 40; los sospechosos, 0 de 384
+        en los cuatro desplazamientos.
+        """
+        def validas(b):
+            ok = 0
+            for i in range(len(b) // 4):
+                f, c, m, r = b[i * 4:i * 4 + 4]
+                if f < 64 and c < 32 and 1 <= m <= 4 and 188 <= r <= 207:
+                    ok += 1
+            return ok, len(b) // 4
+
+        d = cm2()
+        ok, n = validas(sl(d, 0xD900, 0xD9A0))
+        self.assertEqual((ok, n), (40, 40), "la tabla de verdad deberia validar entera")
+
+        mist = sl(d, 0xA400, 0xA800) + sl(d, 0xAE00, 0xB000)
+        for off in range(4):
+            ok, n = validas(mist[off:])
+            self.assertEqual(ok, 0, "el desplazamiento %d da %d entradas validas" % (off, ok))
+
+    @sin_cm2
     def test_no_son_codigo_de_ninguna_cpu(self):
         d = cm2()
         mist = sl(d, 0xA400, 0xA800) + sl(d, 0xAE00, 0xB000) + sl(d, 0xE323, 0xE341)
