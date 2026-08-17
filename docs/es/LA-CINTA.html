@@ -78,7 +78,12 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p>El bloque ASCII funciona distinto: es un programa BASIC guardado como texto plano, y se carga con <code>RUN&quot;cas:&quot;</code>, que lo lee y lo ejecuta. Ocupa 256 bytes clavados porque los ficheros de texto en cinta se escriben en registros de ese tamaño, rellenos con <code>0x1A</code> hasta completarlo.</p>
 <h2 id="el-cargador">El cargador</h2>
 <p>Los 256 bytes del primer bloque son 117 de texto, un <code>0x1A</code> de fin de fichero y 138 más de relleno. El texto es este:</p>
-<p>10 COLOR 1,1,1:SCREEN 2 20 BLOAD&quot;cas:&quot;,R 30 BLOAD&quot;cas:&quot;,R 40 CLEAR200,39824! 50 BLOAD&quot;cas:&quot;,R 60 BLOAD&quot;cas:&quot;,R</p>
+<pre><code>10 COLOR 1,1,1:SCREEN 2
+20 BLOAD&quot;cas:&quot;,R
+30 BLOAD&quot;cas:&quot;,R
+40 CLEAR200,39824!
+50 BLOAD&quot;cas:&quot;,R
+60 BLOAD&quot;cas:&quot;,R</code></pre>
 <p>La línea 10 pone tinta, fondo y borde del mismo color —el 1 es el negro— y pasa al modo gráfico de 256×192. La pantalla queda a oscuras. La 20 trae <code>topo</code>, el logo de la casa, que se ejecuta en su propia dirección de carga, hace su animación y devuelve el control al BASIC. La 30 trae <code>scr</code>, la pantalla de carga, cuyo arranque en 0xB798 la pinta en 0,27 segundos: aparece de golpe, no se ve dibujar.</p>
 <p><img src="../imagenes/carga.png" alt="La pantalla de carga de Colt 36, firmada CANO"></p>
 <p>La 50 trae <code>CM2</code>, los 18 352 bytes de dibujos, decorados y música, y la 60 el juego propiamente dicho.</p>
@@ -94,7 +99,11 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p>Y tenía que ser así a propósito. <code>BSAVE</code> permite omitir la dirección de arranque, pero en ese caso toma la de carga, que aquí es 0x9B91: el <code>,R</code> habría arrancado el reproductor de música con el juego todavía sin cargar. Apuntar el arranque a un <code>RET</code> es la forma de que un bloque de datos puros conviva con un cargador que siempre usa <code>,R</code>.</p>
 <h2 id="el-recolocador-de-cm1">El recolocador de <code>CM1</code></h2>
 <p>El último bloque se carga en 0x83E8 y su dirección de arranque es 0x948F. Ahí hay cinco instrucciones:</p>
-<p>LD HL,0x83E8 LD DE,0x8000 LD BC,0x10B5 LDIR JP 0x9088</p>
+<pre><code>LD HL,0x83E8
+LD DE,0x8000
+LD BC,0x10B5
+LDIR
+JP 0x9088</code></pre>
 <p><code>LDIR</code> copia BC bytes de HL a DE: aquí, los 4277 del bloque entero, mil bytes más abajo. Como el destino queda por debajo del origen, la copia hacia adelante no se muerde la cola. La rutina se copia también a sí misma, y cuando termina salta a 0x9088, que ya está en su sitio.</p>
 <p>La razón de todo el rodeo es que el juego es un programa MSX-BASIC, y en el MSX los programas BASIC viven a partir de 0x8001, que es exactamente donde tiene que acabar <code>CM1</code>. Pero mientras la cinta carga, el programa que manda es el cargador, que también es BASIC y también está en 0x8001, ejecutando el <code>BLOAD</code> de la línea 60. Cargar el juego directamente en su sitio sería escribir encima del programa que está leyendo la cinta. Así que el bloque aterriza mil bytes más arriba, en terreno libre, y solo baja a su casa cuando el cargador ya no hace falta.</p>
 <p>De ahí en adelante ya no queda cinta: los 20 bytes de 0x9088 ponen VARTAB —el puntero donde el intérprete construye su tabla de variables— en 0x8F60 y saltan a la rutina que ejecuta programas. Antes de eso escriben cinco bytes sobre 0x8000, y no es un detalle menor: en la cinta la primera línea del juego viene numerada 65535, por encima del máximo que MSX-BASIC admite, y esos cinco bytes la renumeran como la 4. Quien extraiga el bloque <code>CM1</code> y lo cargue por su cuenta no se lleva el juego: se lleva un programa que se rompe en cuanto busca una línea hacia atrás.</p>

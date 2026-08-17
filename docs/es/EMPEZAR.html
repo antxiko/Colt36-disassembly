@@ -76,7 +76,7 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p><code>src/</code> son los listados publicados; <code>tools/</code> las herramientas que extraen la cinta, desensamblan, dibujan y verifican; <code>tests/</code> las pruebas que contrastan la documentación con el binario; <code>docs/</code> esta documentación y sus imágenes. El <code>Makefile</code> es el punto de entrada. <code>extracted/</code>, <code>work/</code>, <code>dump/</code> y <code>build/</code> los genera <code>make</code> y no van versionados.</p>
 <h2 id="la-cinta-no-esta-aqui">La cinta no está aquí</h2>
 <p>La imagen de cinta <b>no se distribuye</b>: hay que poner la propia, con el nombre <code>colt36.tsx</code> y en la raíz del proyecto. El TSX es un formato de imagen de casete: guarda los bloques tal como se leen del audio. La copia con la que se hizo este trabajo son 34 722 bytes y este sha256:</p>
-<p>4f3090407ff22826a0ce1281908c497396cda972fe10dd0af694330cd62ebe13</p>
+<pre><code>4f3090407ff22826a0ce1281908c497396cda972fe10dd0af694330cd62ebe13</code></pre>
 <p>Si falta, <code>make</code> se para y lo explica; si el sha256 no cuadra, avisa y sigue, porque los listados podrían no corresponder. Dentro hay 34 239 bytes de contenido en cinco bloques.</p>
 <p>Sin ella se puede hacer bastante. Los listados de <code>src/</code> van en el repositorio y se leen sin más. Y de los 58 tests, <b>26 pasan sin el binario</b>: los que contrastan el listado del juego con lo que dice la documentación —que a la línea 730 no salta nadie, o que las direcciones publicadas de las rutinas en código máquina son las que el juego declara con <code>DEFUSR</code>—. Los otros 15 se saltan solos indicando por qué.</p>
 <h2 id="que-hace-make">Qué hace <code>make</code></h2>
@@ -92,7 +92,7 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <h2 id="las-herramientas-que-querras-usar">Las herramientas que querrás usar</h2>
 <p>**<code>tools/basic_detok.py</code>** hace y deshace la tokenización de MSX-BASIC: <code>detok</code> saca el texto de un binario, <code>tok</code> lo convierte de vuelta, <code>check</code> y <code>verify</code> comprueban el viaje de ida y vuelta. Los punteros internos de un programa BASIC son absolutos, así que hay que darle la dirección de carga; aquí, 0x8000.</p>
 <p>**<code>tools/render_niveles.py</code>** reconstruye lo que el juego enseña desde los datos de la cinta, siguiendo las líneas del programa que pintan cada pantalla. No son capturas: es una comprobación. Si el reparto del bloque estuviese mal —si lo que llamamos dibujos fuesen los colores— saldría ruido. Que salgan el título y los cuatro decorados legibles es la prueba más fuerte de que las tablas están donde decimos.</p>
-<p>python3 tools/render_niveles.py work/CM2.raw docs/imagenes</p>
+<pre><code>python3 tools/render_niveles.py work/CM2.raw docs/imagenes</code></pre>
 <p><img src="../imagenes/nivel1.png" alt="El primer nivel, EL ALMACÉN, con su marcador"></p>
 <p><img src="../imagenes/mapa1.png" alt="El decorado entero del mismo nivel, más alto que la pantalla: por ahí se mueve"></p>
 <p>**<code>tools/omsx_juega.tcl</code>** carga la cinta en openMSX, deja el juego funcionando y saca capturas. Cargarla lleva su tiempo —bloques a velocidad normal, sin carga rápida—, así que en cuanto el juego arranca guarda un estado, <code>colt36_arranque</code>, al que se vuelve en un segundo con <code>openmsx -savestate colt36_arranque</code>. Se le indican la cinta y la salida en <code>COLT36_TSX</code> y <code>COLT36_OUT</code>.</p>

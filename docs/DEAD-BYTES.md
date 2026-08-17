@@ -59,6 +59,10 @@ And one of them never gets cleared: line 740, the bandit that fires, draws it an
 
 What they are, no. They've been ruled out as map, as colour, as music and as a copy of any other part of the tape. Ruled out as **PCM** (digitised sound, one sample per byte): the correlation between neighbouring bytes comes out at **−0.27**, and a genuinely sampled signal gives **+0.99**. Ruled out as a **table of note periods**: read as 16-bit words, the deviation from equal temperament is **0.244 semitones**, which is what chance gives, while the game's real period table gives **0.090**.
 
+Start with the most obvious suspicion of all: **they are not more scenery**. They sit inside the scenery block, right up against a real one, so the first thing to do is read them as what lies next door —rows of 32 cells, one tile number per cell— and see whether they fit. They don't, on any count. Of the 55 values they use, only **13 are tiles any of the game's scenery ever puts on screen**, whereas two genuine boards share 21 of 55 with each other. Their commonest cell pairs —`BF 54` seventy-two times, `BB 54` fifty-two, `AB 54` forty-nine— appear **not once** in the scenery that does get shown. And no row of theirs resembles any real row: the closest match is **5 cells out of 32**.
+
+They are not **music** either, and this can be pinned down closely because the player is on this same tape and its format is known: one byte per step, either a note number —up to 0x59, which is as far as the period table reaches— or 0xFE to loop or 0xFF for silence. The game's three tunes obey that rule in **643 bytes out of 643**, every one. The suspects manage **657 out of 1536**, 42.8%: run through the player, more than half of what is there means nothing at all.
+
 Nor are they **a table of bandit hiding places**, which is the most natural suspicion given where they sit. The check is convenient here because the game carries a real one to compare against: the table at 0xD900, four bytes per hiding place — row, column, model and delay. Requiring all four fields to be possible at once (row below 64, column below 32, model 1 to 4, delay between 188 and 207), the genuine table gives **40 valid entries out of 40**. The suspects, read with that same format and trying all four possible alignments, give **0 out of 384**. Not one.
 
 Two of the exclusions deserve a measurement of their own, because they close off whole families of hypotheses at once.
@@ -69,7 +73,7 @@ Two of the exclusions deserve a measurement of their own, because they close off
 
 But that measurement alone is **not enough**, and there is a clear counterexample: a picture drawn with **checkerboard dithering** alternates at every pixel and also gives short runs. Measured on genuinely dithered graphics, the run length comes out at 1.96 — almost the same as these bytes. So a short run says "this is not a picture made of continuous strokes", not "this is not a picture".
 
-What does hold the exclusion up is something else: real dithering uses **many distinct values** — 156 in the case measured — and these use **55**, with the even and odd positions barely sharing any. And above all, drawing them produces no figure at all: 8, 16 and 32 characters wide have been tried, with and without the dither subtracted, de-interleaving even from odd, and as pattern-and-colour pairs. Texture comes out, never a picture.
+What does hold the exclusion up is something else: real dithering uses **many distinct values** — 156 in the case measured — and these use **55**, with the even and odd positions barely sharing any. And above all, drawing them produces no figure at all: 8, 16 and 32 characters wide have been tried, with and without the dither subtracted, de-interleaving even from odd, and as pattern-and-colour pairs. Texture comes out, never a picture. It is worth being precise about how far that exclusion reaches, because reading them as pattern-and-colour pairs is in fact the reading that fits them best and has a section of its own further down: what is ruled out is that they are **a figure**, not that they are pixels.
 
 **The 30-byte tail (0xE323–0xE340).** They sit after the last `RET`, up to the end declared by the header:
 
@@ -87,6 +91,8 @@ Ruling things out isn't the only result. These bytes have a structure that can b
 - **Even bytes carry the odd-numbered bits (7, 3, 1) and odd bytes the even-numbered ones (6, 4, 2).** Seen as an image that gives a checkerboard, and that is where the first hypothesis went; the explanation turned out to be another one, and it is below.
 - **They are six blocks of 256 bytes that are variations on one block.** This is the strongest measurement of the lot. Compared bit by bit, any two blocks differ by **191 bits out of 2048, 9.3 %**. The same measurement on the scenery next door — the part that does get shown — gives **1098 bits, 53.6 %**, which is what chance gives. Searching for the period that leaves the fewest differences, from 1 to 256, the winner is **256** at 9.2 % differing bits; every odd period goes to 74 %, worse than chance. And 256 bytes is exactly one row of 32 screen characters.
 
+  Comparing blocks against each other has a trap in it, and it is worth stepping around: if the template is derived from the same blocks it is then measured on, the resemblance comes out inflated. The honest way is to set one block aside, vote the template bit by bit using the other three, and see how much it gets right on the block that did not vote. It comes out at **91.7 %** of its bits, and it doesn't depend on which one is set aside: 1874, 1888, 1922 and 1826 out of 2048. The scenery next door, given that same test, stops at 48.8 %, and the game's pattern table at 62.5 %. So there really is **a 256-byte template**, repeated six times with about 8 % noise on top, and it isn't an artefact of the arithmetic.
+
 And the 30-byte tail, which had been treated as a separate matter, turns out to carry **the same signature**: strict alternation, even- and odd-position alphabets without a single value in common, complementary fixed bits in each parity. At 30 bytes that could be coincidence and it should be said; at 1536, it couldn't.
 
 ### The best lead: the address dictates the contents
@@ -98,6 +104,18 @@ This is as far as it has got, and it is the lead to follow. What decides which b
 - **The whole block is a two-byte constant with bits knocked out.** The 16-bit word that best fits it is **9B 54**, and the block's 512 words sit an average of **2.46 bits away** from it, out of sixteen. Chance would give 8.
 
 And from that comes, at last, the explanation of why 0xA600–0xA7FF and 0xAE00–0xAFFF are identical byte for byte: they are 0x800 apart, which is a multiple of 128, so **they have the same low address bits**. Nobody needed to copy anything.
+
+How far that lead actually goes can be measured exhaustively, though, and that is what puts it in its place. If the address dictated the contents, every bit of the byte would have to come out of some combination of the address bits — a XOR of a few of them, inverted or not — which is precisely the shape memory has on the inside: eight one-bit chips, and within each one the cell stores the value true or complemented depending on which row it sits in. Brute-forcing all 8192 possible combinations per bit and keeping the best, the tally looks like this:
+
+    power-on RAM: the 88 in the loading screen        100.0 %
+    power-on RAM: the 285 in the variable area         99.3 %
+    -----------------------------------------------------------
+    THE SUSPECTS                                       85.4 %
+    -----------------------------------------------------------
+    the level 1 scenery, a genuine piece of data       77.9 %
+    the game's pattern table                           68.8 %
+
+Freshly powered memory is explained **entirely** by the address, down to the last bit; there is no content there at all, only the chip. The suspects fall short: 15 % of them is left over that the address does not explain, and that is too much for memory alone and too little for ordinary data. They sit in no man's land, and that is why the case doesn't close from this direction.
 
 ### And yet it is not this tape's known rubbish
 
@@ -113,6 +131,22 @@ This is where to put the brakes on. The natural conclusion would be "it's uninit
     the pattern table                        50.4 %
 
 The suspects fit **exactly as well as any old data**, which is to say not at all. If they were the same uninitialised memory from the same machine, they would have to resemble the other two, and they don't. So what there is, is this and no more: bytes whose contents depend on the address — which no data format does — but which are not the power-on pattern that has been identified elsewhere on this tape. They may be uninitialised memory of another kind, from another chip or another moment. They may be something else. What is measured is what is measured.
+
+### Where they fit best: as a drawing with its colour beside it
+
+Ruling things out is the comfortable part; saying where they *do* fit commits you to something, and that is what remains to be told. Of all the readings tried there is one that doesn't fall at the first hurdle: reading them as **pairs**, one byte of pattern —eight pixels, one bit each— followed by its colour byte, ink in the high nibble and background in the low one. That is the MSX screen's own format, and it is how a graphics editor would save them.
+
+What holds that reading up is that **the odd bytes behave like colour better than the game's own colour table does**. Of the 768 of them, **681 carry the same background, dark blue: 88.7 %**; and a single ink-and-background pair, light blue on dark blue, turns up 376 times, nearly half of them. The genuine colour table on this tape is less uniform than that: its commonest background reaches 58.3 %. And the scenery, which is not colour, stops at 31 %. Meanwhile the even bytes do exactly what a dithered drawing does: ramps with the bits falling away one at a time, `FB`, `DB`, `BB`, `8B`.
+
+So they get drawn that way, which is the best reading there is:
+
+![The 1536 bytes read as pattern-and-colour pairs, a screen wide](imagenes/misterio-parejas-32.png)
+
+And beside it, for something to compare against, the neighbouring scenery read in exactly the same way. Those are bytes from the same part of the tape, and what they are is known:
+
+![The scenery next door, read in the same format](imagenes/misterio-control.png)
+
+No figure comes out, and that is why this doesn't close the case: what comes out is a weave of blues on blues thinning from left to right. Which, incidentally, is exactly what a piece of background —a sky, water— cropped from a larger picture with nothing drawn over it would look like. It is an explanation that fits everything measured, and that is why it is here; but fitting is not proving, and there is no way to prove it with what is left on this tape. It would take the rest of the picture, or the same pair format turning up somewhere else.
 
 ### WANTED
 
@@ -133,22 +167,33 @@ This is the one part of the work still open, so it gets published as what it is:
     |   DISTINGUISHING MARKS                                      |
     |     - only 60 distinct byte values in 1566                  |
     |     - bit 1 set in all 768 bytes at even positions          |
-    |     - each bit's polarity tied to the address parity:       |
-    |       bit 1 obeys at 99.2%, bit 6 at 18.8%                  |
+    |     - a 256-byte template repeated six times: set one       |
+    |       block aside and the others get 91.7% of its bits      |
+    |       right (the scenery next door: 48.8%)                  |
     |     - the only 8 0xFF at odd addresses all land where       |
     |       the 7 low address bits are all ones                   |
-    |     - six blocks of 256 bytes differing in only 9% of       |
-    |       their bits (the scenery next door: 54%)               |
+    |     - the address explains 85.4% of their bits: more        |
+    |       than data does (68-78%) and less than the freshly     |
+    |       powered memory on this same tape (99-100%)            |
     |                                                             |
     |   NOT  code of any CPU (60 byte values, zero CALL and       |
     |        zero RET in 1566) - a picture at any width: 8,       |
     |        16 and 32 wide tried, with and without dither        |
     |        and de-interleaved; texture comes out, never a       |
-    |        figure) - map - colour -                             |
-    |        music - digitised sound - note table - a copy of     |
-    |        another part of the tape - the power-on RAM this     |
-    |        tape does carry (47.7% fit; the other regions        |
-    |        99-100%)                                             |
+    |        figure) - more scenery (13 of their 55 values are    |
+    |        tiles the game draws; their commonest pairs occur    |
+    |        0 times in the real boards) - music (657 of 1536     |
+    |        bytes are valid player events; the real tunes,       |
+    |        643 of 643) - map - colour - digitised sound -       |
+    |        note table - a copy of another part of the tape -    |
+    |        the power-on RAM this tape does carry (47.7% fit;    |
+    |        the other regions 99-100%)                           |
+    |                                                             |
+    |   THE LIVEST LEAD  read as pattern-and-colour pairs, 681    |
+    |     of their 768 odd bytes carry the same background        |
+    |     (88.7%): as colour they behave better than the          |
+    |     game's own colour table (58.3%). But drawing them       |
+    |     yields no figure: only blue-on-blue weave.              |
     |                                                             |
     |   WANTED ALIVE: someone to say what they are.               |
     |   ACCEPTED DEAD: a "not X, and here is the measurement      |
@@ -288,9 +333,10 @@ Playing with them doesn't mean repeating the teardown. With your own copy of the
 ```sh
 make extract
 python3 tools/extrae_misterio.py work work
+python3 tools/render_misterio.py work/CM2.raw work
 ```
 
-That leaves `work/misterio.bin` (all 1566), `work/misterio_mapas.bin` (the 1536 from the scenery) and `work/misterio_cola.bin` (the 30), and prints every measurement above so they can be checked before anything is taken as read.
+That leaves `work/misterio.bin` (all 1566), `work/misterio_mapas.bin` (the 1536 from the scenery) and `work/misterio_cola.bin` (the 30), prints every measurement above —each one with its control beside it, which is what makes it mean anything— and redraws the pair images in case you want to change their width or the reading.
 
 If you think you know what they are, [open an issue](https://github.com/antxiko/Colt36-disassembly/issues/new/choose). What's needed isn't the idea — there have been plenty, and several were good — but the measurement behind it: what you would have to see if the hypothesis were true, and what comes out when you look.
 

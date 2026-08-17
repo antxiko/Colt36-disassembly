@@ -78,7 +78,12 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p>The ASCII block works differently: it is a BASIC program saved as plain text, and it is loaded with <code>RUN&quot;cas:&quot;</code>, which reads it and runs it. It takes up exactly 256 bytes because text files on tape are written in records of that size, padded with <code>0x1A</code> until they are full.</p>
 <h2 id="the-loader">The loader</h2>
 <p>The 256 bytes of the first block are 117 of text, one <code>0x1A</code> end-of-file byte and 138 more of padding. The text is this:</p>
-<p>10 COLOR 1,1,1:SCREEN 2 20 BLOAD&quot;cas:&quot;,R 30 BLOAD&quot;cas:&quot;,R 40 CLEAR200,39824! 50 BLOAD&quot;cas:&quot;,R 60 BLOAD&quot;cas:&quot;,R</p>
+<pre><code>10 COLOR 1,1,1:SCREEN 2
+20 BLOAD&quot;cas:&quot;,R
+30 BLOAD&quot;cas:&quot;,R
+40 CLEAR200,39824!
+50 BLOAD&quot;cas:&quot;,R
+60 BLOAD&quot;cas:&quot;,R</code></pre>
 <p>Line 10 sets ink, background and border to the same colour — 1 is black — and switches to the 256×192 graphics mode. The screen goes dark. Line 20 brings in <code>topo</code>, the company logo, which runs at its own load address, does its animation and hands control back to BASIC. Line 30 brings in <code>scr</code>, the loading screen, whose start address at 0xB798 paints it in 0.27 seconds: it appears all at once, you never see it being drawn.</p>
 <p><img src="imagenes/carga.png" alt="The Colt 36 loading screen, signed CANO"></p>
 <p>Line 50 brings in <code>CM2</code>, the 18,352 bytes of artwork, scenery and music, and line 60 the game itself.</p>
@@ -94,7 +99,11 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p>And it had to be that way on purpose. <code>BSAVE</code> lets you leave out the start address, but in that case it takes the load address, which here is 0x9B91: the <code>,R</code> would have fired up the music player with the game not yet loaded. Pointing the start address at a <code>RET</code> is how a block of pure data gets along with a loader that always uses <code>,R</code>.</p>
 <h2 id="the-cm1-relocator">The <code>CM1</code> relocator</h2>
 <p>The last block loads at 0x83E8 and its start address is 0x948F. There sit five instructions:</p>
-<p>LD HL,0x83E8 LD DE,0x8000 LD BC,0x10B5 LDIR JP 0x9088</p>
+<pre><code>LD HL,0x83E8
+LD DE,0x8000
+LD BC,0x10B5
+LDIR
+JP 0x9088</code></pre>
 <p><code>LDIR</code> copies BC bytes from HL to DE: here, all 4277 of the whole block, a thousand bytes further down. Since the destination is below the source, copying forwards never bites its own tail. The routine copies itself too, and when it is done it jumps to 0x9088, which is by then already in place.</p>
 <p>The reason for the whole detour is that the game is an MSX-BASIC program, and on the MSX, BASIC programs live from 0x8001 onwards, which is exactly where <code>CM1</code> has to end up. But while the tape is loading, the program in charge is the loader, which is also BASIC and is also at 0x8001, running the <code>BLOAD</code> on line 60. Loading the game straight into its place would mean writing over the program that is reading the tape. So the block lands a thousand bytes higher up, on free ground, and only comes down to its home once the loader is no longer needed.</p>
 <p>From there on there is no tape left: the 20 bytes at 0x9088 set VARTAB — the pointer where the interpreter builds its variable table — to 0x8F60 and jump to the routine that runs programs. Before that they write five bytes over 0x8000, and that is no small detail: on tape the game&#x27;s first line is numbered 65535, above the maximum MSX-BASIC accepts, and those five bytes renumber it as line 4. Anyone who extracts the <code>CM1</code> block and loads it on their own does not get the game: they get a program that breaks the moment it looks for a line backwards.</p>

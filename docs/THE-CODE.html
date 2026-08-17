@@ -90,7 +90,7 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p><img src="imagenes/mapa3.png" alt="The full backdrop for level 3, LA MINA (the mine): 32 columns by 64 rows"></p>
 <h2 id="startup-and-why-the-program-cannot-be-listed">Startup, and why the program cannot be listed</h2>
 <p>Tape block <code>CM1</code> is 4277 bytes loaded at 0x83E8. Its start address, 0x948F, lands on a five-instruction relocator that copies itself and everything else 1000 bytes lower down:</p>
-<p>LD HL,0x83E8 / LD DE,0x8000 / LD BC,0x10B5 / LDIR / JP 0x9088</p>
+<pre><code>LD HL,0x83E8 / LD DE,0x8000 / LD BC,0x10B5 / LDIR / JP 0x9088</code></pre>
 <p>It loads at 0x83E8 rather than straight to 0x8000 because while the game is loading the one in charge is the tape loader, which is itself a BASIC program and lives from 0x8001 onwards: loading over it would trample the very program running the <code>BLOAD</code>.</p>
 <p>Once in place, the startup at 0x9088 does three things: it copies five bytes over the beginning of the program, points VARTAB (0xF6C2, the pointer where the interpreter builds its variable table) at 0x8F60, and jumps to 0x73AC, the interpreter routine that starts executing.</p>
 <p>Those five bytes are a protection. On tape, <b>the first line of the program is numbered 65535</b>, above the maximum MSX-BASIC allows, and the startup writes the number 4 over it. Without that patch the game does not work: verified in the emulator by jumping in past the copy, the <code>GOSUB 20</code> on line 520 aborts with <em>Undefined line number in 520</em>. Anyone who lifts the block and loads it on their own gets not a listable program but a broken one.</p>

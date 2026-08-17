@@ -23,6 +23,10 @@ Uso:  python3 tools/extrae_misterio.py work [directorio_salida]
 
 Escribe misterio.bin (los 1566 seguidos), misterio_mapas.bin (solo los 1536 de
 los decorados) y misterio_cola.bin (los 30), y saca por pantalla la firma.
+
+Cada medida va con su CONTROL: la misma cuenta hecha sobre bytes de esta cinta
+de los que si se sabe lo que son. Una cifra sola no dice nada; lo que dice algo
+es la distancia entre la cifra de los sospechosos y la del control.
 """
 import os
 import sys
@@ -104,6 +108,81 @@ def depende_de_la_direccion(datos, base):
           % (100.0 * bits / (len(datos) * 8)))
 
 
+def bits_de(bloque):
+    """Los bits de un bloque como lista de 0/1, bit 7 primero."""
+    out = []
+    for b in bloque:
+        for k in range(7, -1, -1):
+            out.append((b >> k) & 1)
+    return out
+
+
+def plantilla_validada(bloques):
+    """El motivo de 256 bytes, medido SIN hacerse trampas.
+
+    Los bloques de 256 se parecen entre si; la forma honrada de medir cuanto es
+    dejar uno fuera, votar la plantilla bit a bit con los demas, y contar
+    cuantos bits del bloque apartado -que no ha votado- reproduce. Devuelve los
+    aciertos (de 2048) por cada bloque dejado fuera.
+    """
+    bb = [bits_de(b) for b in bloques]
+    n = len(bb[0])
+    res = []
+    for fuera in range(len(bb)):
+        dentro = [bb[i] for i in range(len(bb)) if i != fuera]
+        aciertos = 0
+        for pos in range(n):
+            voto = 1 if sum(d[pos] for d in dentro) * 2 > len(dentro) else 0
+            aciertos += (voto == bb[fuera][pos])
+        res.append(aciertos)
+    return res, n
+
+
+def mejor_xor(datos, base, nbits=12):
+    """Para cada bit de dato, el mejor 'XOR de bits de la direccion' posible.
+
+    Es la idea de 'el contenido lo dicta la direccion' llevada al limite: se
+    prueban por fuerza bruta las 8192 combinaciones por bit (todas las mascaras
+    de los 12 bits bajos, con y sin inversion) y se queda la que mas acierta.
+    El truco para que sea instantaneo: los predictores se recorren en codigo
+    Gray, cada paso es UN xor de enteros grandes, y los aciertos los da
+    bit_count. Devuelve [(aciertos, mascara, inversion)] por bit de dato.
+    """
+    n = len(datos)
+    bases = []
+    for j in range(nbits):
+        v = 0
+        for i in range(n):
+            if ((base + i) >> j) & 1:
+                v |= 1 << i
+        bases.append(v)
+    resultado = []
+    for bit in range(8):
+        d = 0
+        for i in range(n):
+            if (datos[i] >> bit) & 1:
+                d |= 1 << i
+        mejor = (-1, 0, 0)
+        pred, g_ant = 0, 0
+        for k in range(1 << nbits):
+            g = k ^ (k >> 1)
+            if k:
+                pred ^= bases[(g ^ g_ant).bit_length() - 1]
+            g_ant = g
+            coinc = n - (pred ^ d).bit_count()
+            if coinc > mejor[0]:
+                mejor = (coinc, g, 0)
+            if n - coinc > mejor[0]:
+                mejor = (n - coinc, g, 1)
+        resultado.append(mejor)
+    return resultado
+
+
+def suma_xor(datos, base):
+    r = mejor_xor(datos, base)
+    return sum(a for a, _, _ in r), 8 * len(datos)
+
+
 def control(cm2):
     """La misma medida sobre el decorado que SI se ve, para tener con que comparar."""
     v = cm2[0xA000 - ORG_CM2:0xA400 - ORG_CM2]
@@ -124,6 +203,121 @@ def control(cm2):
 
 def v_slice(cm2):
     return cm2[0xA000 - ORG_CM2:0xA400 - ORG_CM2]
+
+
+VISIBLE = [0x400, 0x600, 0x800, 0x800]   # lo que el tope del scroll deja ver de cada tablero
+
+
+def tableros(cm2):
+    return [cm2[0xA000 + 0x800 * i - ORG_CM2:0xA800 + 0x800 * i - ORG_CM2] for i in range(4)]
+
+
+def filas_visibles(cm2):
+    """Todas las filas de 32 tiles que el juego llega a ensenar."""
+    out = []
+    for m, v in zip(tableros(cm2), VISIBLE):
+        out += [m[f:f + 32] for f in range(0, v, 32)]
+    return out
+
+
+def la_plantilla(cm2, sosp):
+    """La medida mas fuerte: una plantilla de 256 bytes repetida seis veces."""
+    print("  Una plantilla de 256 bytes, repetida con variaciones")
+    print("     (se deja un bloque fuera, se vota la plantilla con los otros tres")
+    print("      y se cuenta cuanto acierta sobre el que no ha votado)")
+    for etq, datos in (("los sospechosos      ", sosp),
+                       ("CONTROL decorado visible", v_slice(cm2)),
+                       ("CONTROL tabla de dibujos", cm2[0xC000 - ORG_CM2:0xC400 - ORG_CM2])):
+        res, n = plantilla_validada([datos[i * 256:(i + 1) * 256] for i in range(4)])
+        print("     %s: %s  -> %.1f%% de sus bits"
+              % (etq, " ".join("%d" % r for r in res), 100.0 * sum(res) / (len(res) * n)))
+    print("     El azar da 50%. Lo de al lado, que es un dato de verdad, se queda ahi.")
+
+
+def xor_de_la_direccion(cm2, work):
+    """Hasta donde llega 'el contenido lo dicta la direccion' si se ajusta del todo."""
+    print("  Cuanto explica la direccion, ajustando el mejor XOR de sus bits")
+    filas = [("los sospechosos de 0xA400", cm2[0xA400 - ORG_CM2:0xA800 - ORG_CM2], 0xA400),
+             ("los sospechosos de 0xAE00", cm2[0xAE00 - ORG_CM2:0xB000 - ORG_CM2], 0xAE00),
+             ("CONTROL decorado visible ", v_slice(cm2), 0xA000),
+             ("CONTROL tabla de dibujos ", cm2[0xC000 - ORG_CM2:0xC400 - ORG_CM2], 0xC000)]
+    # los dos controles positivos viven en otros bloques de la cinta
+    try:
+        scr = open(os.path.join(work, "scr.raw"), "rb").read()
+        filas.append(("RAM de encendido: los 88 ", scr[6912:7000], 0xB740))
+    except OSError:
+        pass
+    try:
+        cm1 = open(os.path.join(work, "CM1.raw"), "rb").read()
+        filas.append(("RAM de encendido: los 285", cm1[0x8F6B - 0x8000:0x9088 - 0x8000], 0x8F6B))
+    except OSError:
+        pass
+    for etq, datos, base in filas:
+        ok, tot = suma_xor(datos, base)
+        print("     %s: %5d de %5d bits (%.1f%%)" % (etq, ok, tot, 100.0 * ok / tot))
+    print("     La RAM de encendido de verdad se explica ENTERA con la direccion.")
+    print("     Los sospechosos no llegan, y un dato normal se queda mas abajo:")
+    print("     tienen estructura de direccion, pero no son ese tipo de basura.")
+
+
+def lente_de_tablero(cm2, sosp):
+    """Leidos como lo que tienen al lado: filas de 32 tiles de un decorado."""
+    print("  Leidos como decorado, que es lo que tienen al lado")
+    vis = set()
+    for m, v in zip(tableros(cm2), VISIBLE):
+        vis |= set(m[:v])
+    ts = set(sosp)
+    print("     valores que usan: %d ; tiles que usan los decorados de verdad: %d ; en comun: %d"
+          % (len(ts), len(vis), len(ts & vis)))
+    t3 = set(tableros(cm2)[2][:0x400])
+    t4 = set(tableros(cm2)[3][:0x400])
+    print("     CONTROL, dos decorados de verdad entre si: %d valores, %d en comun"
+          % (len(t3), len(t3 & t4)))
+    pares = Counter()
+    for i in range(0, len(sosp), 2):
+        pares[(sosp[i], sosp[i + 1])] += 1
+    top = pares.most_common(6)
+    print("     sus parejas mas repetidas: %s"
+          % ", ".join("%02X %02X x%d" % (x, y, n) for (x, y), n in top))
+    fv = filas_visibles(cm2)
+    en_vis = sum(1 for (x, y), _ in top for f in fv for c in range(0, 32, 2)
+                 if f[c] == x and f[c + 1] == y)
+    print("     esas seis parejas, en los decorados que si se ven: %d veces" % en_vis)
+    mejor = max(sum(1 for k in range(32) if sosp[i + k] == f[k])
+                for i in range(0, len(sosp), 32) for f in fv)
+    print("     y la fila suya que mas se parece a una de verdad: %d casillas de 32" % mejor)
+
+
+def lente_de_color(cm2, sosp):
+    """La medida que mas les favorece: los impares, leidos como bytes de color."""
+    print("  Leidos como parejas (dibujo, color), que es donde mejor encajan")
+    imp = sosp[1::2]
+    bajo = Counter(b & 15 for b in imp).most_common(1)[0]
+    print("     de sus 768 bytes impares, %d llevan el fondo %X: el %.1f%%"
+          % (bajo[1], bajo[0], 100.0 * bajo[1] / len(imp)))
+    pareja = Counter((b >> 4, b & 15) for b in imp).most_common(1)[0]
+    print("     y la pareja tinta/fondo %X sobre %X sale %d veces, el %.1f%%"
+          % (pareja[0][0], pareja[0][1], pareja[1], 100.0 * pareja[1] / len(imp)))
+    col = cm2[0xC800 - ORG_CM2:0xD000 - ORG_CM2]
+    c = Counter(b & 15 for b in col).most_common(1)[0]
+    print("     CONTROL, la tabla de color de verdad: su fondo %X sale el %.1f%%"
+          % (c[0], 100.0 * c[1] / len(col)))
+    m = Counter(b & 15 for b in v_slice(cm2)).most_common(1)[0]
+    print("     CONTROL, el decorado (que no es color): su nibble bajo sale el %.1f%%"
+          % (100.0 * m[1] / len(v_slice(cm2))))
+    print("     O sea que como color se comportan MEJOR que la tabla de color del juego.")
+
+
+def lente_de_musica(cm2, sosp):
+    """El reproductor de la cinta lee un byte por paso: o nota, o 0xFE, o 0xFF."""
+    def validos(b):
+        return sum(1 for x in b if x <= 0x59 or x in (0xFE, 0xFF))
+    mel = cm2[0x9D7D - ORG_CM2:0xA000 - ORG_CM2]
+    print("  Leidos como musica, con el formato del reproductor de esta misma cinta")
+    print("     las melodias de verdad: %d de %d bytes son eventos validos (todos)"
+          % (validos(mel), len(mel)))
+    print("     los sospechosos:        %d de %d (%.1f%%), o sea que no lo son"
+          % (validos(sosp), len(sosp), 100.0 * validos(sosp) / len(sosp)))
 
 
 def main(argv):
@@ -161,6 +355,16 @@ def main(argv):
     depende_de_la_direccion(trozos["mapa1"], 0xA400)
     print()
     control(cm2)
+    print()
+    la_plantilla(cm2, trozos["mapa1"])
+    print()
+    xor_de_la_direccion(cm2, work)
+    print()
+    lente_de_tablero(cm2, mapas)
+    print()
+    lente_de_color(cm2, mapas)
+    print()
+    lente_de_musica(cm2, mapas)
     print()
     firma(cola, "la cola de 30")
     print()

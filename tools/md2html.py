@@ -106,6 +106,20 @@ def convierte(texto, titulo, actual, idioma="en"):
                 cuerpo.append(ln[j]); j += 1
             out.append("<pre><code>" + html.escape("\n".join(cuerpo)) + "</code></pre>")
             i = j + 1; continue
+        if re.match(r"^ {4,}\S", l):                # bloque de codigo indentado
+            # Sin esto, una tabla escrita con cuatro espacios de sangria acaba
+            # amasada dentro de un <p>, en una sola linea, y no se lee. Pasaba
+            # con las cifras del cartel de SE BUSCA.
+            cuerpo = []
+            while i < len(ln) and re.match(r"^ {4,}\S", ln[i]):
+                cuerpo.append(ln[i][4:])
+                i += 1
+                # una linea en blanco no corta el bloque si detras sigue indentado
+                if i < len(ln) and not ln[i].strip() and \
+                        i + 1 < len(ln) and re.match(r"^ {4,}\S", ln[i + 1]):
+                    cuerpo.append(""); i += 1
+            out.append("<pre><code>" + html.escape("\n".join(cuerpo)) + "</code></pre>")
+            continue
         if re.match(r"^\s*\|", l) and i + 1 < len(ln) and re.match(r"^\s*\|[\s:|-]+\|?\s*$", ln[i + 1]):
             filas = []                              # tabla
             while i < len(ln) and re.match(r"^\s*\|", ln[i]):

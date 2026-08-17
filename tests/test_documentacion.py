@@ -283,6 +283,20 @@ def hamming(x, y):
     return sum(POP[a ^ b] for a, b in zip(x, y))
 
 
+def herramienta():
+    """tools/extrae_misterio.py, para medir con lo mismo que publica las cifras.
+
+    Si el test repitiera la cuenta por su cuenta, la herramienta y la cifra
+    publicada podrian irse cada una por su lado sin que nada avisara.
+    """
+    import importlib.util
+    ruta = os.path.join(RAIZ, "tools", "extrae_misterio.py")
+    spec = importlib.util.spec_from_file_location("extrae_misterio", ruta)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def misterio():
     """Los 1536 bytes sin identificar, los del cartel."""
     d = cm2()
@@ -570,6 +584,142 @@ class TestLaPistaDeLaDireccion(unittest.TestCase):
         self.assertGreater(racha(sl(d, 0xA000, 0xA400)), 3.5)   # el mapa del nivel 1
         # El azar da 2,00 exacto, asi que los sospechosos estan por DEBAJO.
         self.assertLess(racha(mist), 2.0)
+
+
+class TestLasMedidasQueSostienenElCartel(unittest.TestCase):
+    """Las cifras del cartel SE BUSCA, calculadas con la MISMA herramienta.
+
+    Se importan las funciones de tools/extrae_misterio.py en vez de repetir la
+    cuenta aqui: si la herramienta y el test calcularan cada uno por su lado,
+    podrian separarse sin que nada avisara, que es justo lo que estos tests
+    existen para impedir. Y ademas se comprueba que la cifra esta escrita en
+    las DOS lenguas de la web, que es donde se van desincronizando solas.
+    """
+
+    @sin_cm2
+    def test_la_plantilla_de_256_validada_dejando_un_bloque_fuera(self):
+        m = herramienta()
+        d = cm2()
+        sosp = sl(d, 0xA400, 0xA800)
+        res, n = m.plantilla_validada([sosp[i * 256:(i + 1) * 256] for i in range(4)])
+        self.assertEqual(res, [1874, 1888, 1922, 1826])
+        self.assertAlmostEqual(100.0 * sum(res) / (4 * n), 91.7, places=1)
+
+        # Los dos controles: el mismo calculo sobre bytes de los que SI se sabe
+        # que son. Sin ellos el 91,7 % no significaria nada.
+        vis = sl(d, 0xA000, 0xA400)
+        res2, _ = m.plantilla_validada([vis[i * 256:(i + 1) * 256] for i in range(4)])
+        self.assertAlmostEqual(100.0 * sum(res2) / (4 * n), 48.8, places=1)
+        pat = sl(d, 0xC000, 0xC400)
+        res3, _ = m.plantilla_validada([pat[i * 256:(i + 1) * 256] for i in range(4)])
+        self.assertAlmostEqual(100.0 * sum(res3) / (4 * n), 62.5, places=1)
+
+    @sin_cm2
+    def test_cuanto_explica_la_direccion_y_por_que_no_basta(self):
+        """El 85,4 % que los deja en tierra de nadie."""
+        m = herramienta()
+        d = cm2()
+
+        def pct(datos, base):
+            ok, tot = m.suma_xor(datos, base)
+            return 100.0 * ok / tot
+
+        ok_a, tot_a = m.suma_xor(sl(d, 0xA400, 0xA800), 0xA400)
+        ok_b, tot_b = m.suma_xor(sl(d, 0xAE00, 0xB000), 0xAE00)
+        self.assertAlmostEqual(100.0 * (ok_a + ok_b) / (tot_a + tot_b), 85.4, places=1)
+        # Por debajo, los datos de verdad.
+        self.assertAlmostEqual(pct(sl(d, 0xA000, 0xA400), 0xA000), 77.9, places=1)
+        self.assertAlmostEqual(pct(sl(d, 0xC000, 0xC400), 0xC000), 68.8, places=1)
+
+    @sin_cm1
+    def test_la_ram_de_encendido_de_verdad_se_explica_ENTERA_con_la_direccion(self):
+        """El control positivo: es lo que separa 'basura' de 'no se sabe'."""
+        m = herramienta()
+        with open(os.path.join(WORK, "CM1.raw"), "rb") as f:
+            cm1 = f.read()
+        ok, tot = m.suma_xor(cm1[0x8F6B - 0x8000:0x9088 - 0x8000], 0x8F6B)
+        self.assertAlmostEqual(100.0 * ok / tot, 99.3, places=1)
+
+    @sin_cm2
+    def test_no_son_mas_decorado_aunque_esten_dentro_del_bloque_de_decorados(self):
+        d = cm2()
+        mist = sl(d, 0xA400, 0xA800) + sl(d, 0xAE00, 0xB000)
+        VISIBLE = [0x400, 0x600, 0x800, 0x800]
+        tableros = [sl(d, 0xA000 + 0x800 * i, 0xA800 + 0x800 * i) for i in range(4)]
+
+        vistos = set()
+        for t, v in zip(tableros, VISIBLE):
+            vistos |= set(t[:v])
+        self.assertEqual(len(set(mist)), 55)
+        self.assertEqual(len(vistos), 91)
+        self.assertEqual(len(set(mist) & vistos), 13)
+        # Control: dos decorados de verdad comparten bastante mas entre ellos.
+        self.assertEqual(len(set(tableros[2][:0x400]) & set(tableros[3][:0x400])), 21)
+
+        filas = []
+        for t, v in zip(tableros, VISIBLE):
+            filas += [t[f:f + 32] for f in range(0, v, 32)]
+        pares = {}
+        for i in range(0, len(mist), 2):
+            pares[(mist[i], mist[i + 1])] = pares.get((mist[i], mist[i + 1]), 0) + 1
+        top = sorted(pares.items(), key=lambda kv: -kv[1])[:6]
+        self.assertEqual(top[0], ((0xBF, 0x54), 72))
+        apariciones = sum(1 for (x, y), _ in top for f in filas for c in range(0, 32, 2)
+                          if f[c] == x and f[c + 1] == y)
+        self.assertEqual(apariciones, 0, "sus parejas no salen en ningun decorado real")
+        mejor = max(sum(1 for k in range(32) if mist[i + k] == f[k])
+                    for i in range(0, len(mist), 32) for f in filas)
+        self.assertEqual(mejor, 5, "ninguna fila suya se parece a una de verdad")
+
+    @sin_cm2
+    def test_no_son_musica_con_el_formato_del_reproductor_de_esta_cinta(self):
+        d = cm2()
+
+        def validos(b):
+            return sum(1 for x in b if x <= 0x59 or x in (0xFE, 0xFF))
+
+        melodias = sl(d, 0x9D7D, 0xA000)
+        self.assertEqual(validos(melodias), len(melodias), "las de verdad valen TODAS")
+        mist = sl(d, 0xA400, 0xA800) + sl(d, 0xAE00, 0xB000)
+        self.assertEqual(validos(mist), 657)
+        self.assertAlmostEqual(100.0 * 657 / len(mist), 42.8, places=1)
+
+    @sin_cm2
+    def test_como_color_se_portan_mejor_que_la_tabla_de_color_del_juego(self):
+        """La pista mas viva que se publica, con su control al lado."""
+        d = cm2()
+        mist = sl(d, 0xA400, 0xA800) + sl(d, 0xAE00, 0xB000)
+        impares = mist[1::2]
+        self.assertEqual(len(impares), 768)
+        self.assertEqual(sum(1 for b in impares if (b & 15) == 4), 681)
+        self.assertAlmostEqual(100.0 * 681 / 768, 88.7, places=1)
+        self.assertEqual(sum(1 for b in impares if b == 0x54), 376)
+
+        color = sl(d, 0xC800, 0xD000)
+        mas = max(sum(1 for b in color if (b & 15) == n) for n in range(16))
+        self.assertAlmostEqual(100.0 * mas / len(color), 58.3, places=1)
+
+    def test_las_cifras_nuevas_estan_en_las_dos_lenguas_y_las_dos_veces(self):
+        """Que las dos lenguas discrepen es lo mas facil de cazar y lo que mas pasa.
+
+        Se cuentan las APARICIONES, no basta con que la cifra este. Varias salen
+        dos veces en la misma pagina -una en el texto y otra en el cartel- y con
+        un 'esta o no esta' se puede cambiar una de las dos y que nada chille;
+        una cifra escrita en dos sitios se separa sola si nadie mira.
+        """
+        VECES = {"1874": 1, "657": 2, "681": 2, "376": 1}
+        DECIMALES = {"91,7": 2, "85,4": 2, "88,7": 2, "48,8": 2,
+                     "62,5": 1, "42,8": 1, "58,3": 2}
+        for fichero, coma in (("DEAD-BYTES.md", False),
+                              (os.path.join("es", "BYTES-MUERTOS.md"), True)):
+            t = doc(fichero)
+            esperado = dict(VECES)
+            for numero, veces in DECIMALES.items():
+                esperado[numero if coma else numero.replace(",", ".")] = veces
+            for numero, veces in esperado.items():
+                self.assertEqual(t.count(numero), veces,
+                                 "%s deberia salir %d vez/veces en %s"
+                                 % (numero, veces, fichero))
 
 
 class TestLaHuellaDeLaRamSinInicializar(unittest.TestCase):

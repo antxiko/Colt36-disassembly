@@ -59,6 +59,10 @@ Y hay uno que no se borra: la línea 740, la del bandido que dispara, lo pinta y
 
 Qué son, no. Se ha descartado que sean mapa, color, música o copia de cualquier otra parte de la cinta. Se ha descartado que sean **PCM** (sonido digitalizado, una muestra por byte): la correlación entre bytes vecinos sale **−0,27**, y una señal muestreada de verdad da **+0,99**. Se ha descartado que sean una **tabla de periodos de notas**: leídos como palabras de 16 bits, la desviación respecto a la escala templada es de **0,244 semitonos**, que es lo que da el azar, mientras que la tabla de periodos real del juego da **0,090**.
 
+Empezando por la sospecha más obvia de todas: **no son más decorado**. Están dentro del bloque de los decorados, pegados a uno de verdad, así que lo primero es leerlos como lo que tienen al lado —filas de 32 casillas, un número de dibujo por casilla— y ver si pegan. No pegan por ninguna parte. De los 55 valores que usan, solo **13 son dibujos que algún decorado del juego llegue a poner en pantalla**, cuando dos decorados de verdad comparten 21 de 55 entre ellos. Sus parejas de casillas más repetidas —`BF 54` setenta y dos veces, `BB 54` cincuenta y dos, `AB 54` cuarenta y nueve— no aparecen **ni una sola vez** en los decorados que sí se ven. Y ninguna de sus filas se parece a ninguna fila real: la que más, coincide en **5 casillas de 32**.
+
+Tampoco son **música**, y esto se puede afinar mucho porque el reproductor está en esta misma cinta y se sabe cómo lee: un byte por paso, que o es un número de nota —hasta 0x59, que es lo que alcanza la tabla de periodos— o es 0xFE para volver al principio o 0xFF para callar. Las tres melodías del juego cumplen esa regla en **643 bytes de 643**, todos. Los sospechosos, en **657 de 1536**, el 42,8 %: pasado por el reproductor, más de la mitad de lo que hay ahí no significa nada.
+
 Y tampoco son **una tabla de escondites de bandidos**, que es la sospecha más natural teniendo en cuenta dónde están. Aquí la comprobación es cómoda porque el juego trae una de verdad con la que comparar: la de 0xD900, con cuatro bytes por escondite —fila, columna, modelo y retardo—. Exigiendo que los cuatro campos sean posibles a la vez (fila menor que 64, columna menor que 32, modelo del 1 al 4 y retardo entre 188 y 207), la tabla auténtica da **40 entradas válidas de 40**. Los sospechosos, leídos con ese mismo formato y probando los cuatro desplazamientos posibles, dan **0 de 384**. Ni una.
 
 Y hay dos descartes que merecen su propia medida, porque cierran de golpe familias enteras de hipótesis.
@@ -69,7 +73,7 @@ Y hay dos descartes que merecen su propia medida, porque cierran de golpe famili
 
 Pero esa medida sola **no basta**, y hay un contraejemplo claro: un dibujo hecho con **tramado en damero** alterna a cada píxel y también da rachas cortas. Medido sobre un gráfico tramado de verdad, la racha sale en 1,96, casi lo mismo que estos bytes. Así que la racha corta dice «esto no es un dibujo de trazos continuos», no «esto no es un dibujo».
 
-Lo que sí sostiene el descarte es otra cosa: un tramado de verdad usa **muchos valores distintos** —156 en el ejemplo medido—, y estos usan **55**, con las posiciones pares y las impares sin apenas compartir ninguno. Y sobre todo, dibujarlos no produce ninguna figura: se han probado 8, 16 y 32 caracteres de ancho, con y sin la trama restada, desintercalando pares e impares, y como parejas de patrón y color. Sale textura, nunca un dibujo.
+Lo que sí sostiene el descarte es otra cosa: un tramado de verdad usa **muchos valores distintos** —156 en el ejemplo medido—, y estos usan **55**, con las posiciones pares y las impares sin apenas compartir ninguno. Y sobre todo, dibujarlos no produce ninguna figura: se han probado 8, 16 y 32 caracteres de ancho, con y sin la trama restada, desintercalando pares e impares, y como parejas de patrón y color. Sale textura, nunca un dibujo. Conviene precisar hasta dónde llega ese descarte, porque la lectura como parejas de dibujo y color es justamente la que mejor se les ajusta y tiene su propio apartado más abajo: lo que está descartado es que sean **una figura**, no que sean píxeles.
 
 **La cola de 30 bytes (0xE323–0xE340).** Van detrás del último `RET`, hasta el final que declara la cabecera:
 
@@ -87,6 +91,8 @@ Descartar cosas no es el único resultado. Estos bytes tienen una estructura que
 - **Los bytes pares llevan encendidos los bits de índice impar (7, 3, 1) y los impares los de índice par (6, 4, 2).** Visto como imagen eso da un damero, y por ahí se fue la primera hipótesis; la explicación resultó ser otra, y está más abajo.
 - **Son seis bloques de 256 bytes que son variaciones de un mismo bloque.** Esta es la medida más fuerte de todas. Comparando bit a bit, dos bloques cualesquiera se diferencian en **191 bits de 2048, un 9,3 %**. La misma medida sobre el decorado de al lado —el que sí se ve— da **1098 bits, un 53,6 %**, que es lo que da el azar. Buscando el periodo que menos diferencias deja, entre 1 y 256, gana **256** con un 9,2 % de bits distintos; todos los periodos impares se van al 74 %, por encima del azar. Y 256 bytes es exactamente una fila de 32 caracteres de pantalla.
 
+  Comparar bloques entre sí tiene una trampa, y conviene esquivarla: si la plantilla se saca de los mismos bloques con los que luego se mide, el parecido sale inflado. La forma honrada es apartar un bloque, votar la plantilla bit a bit con los otros tres y ver cuánto acierta sobre el que no ha votado. Sale **el 91,7 %** de sus bits, y no depende de cuál se aparte: 1874, 1888, 1922 y 1826 de 2048. El decorado de al lado, con esa misma prueba, se queda en el 48,8 %, y la tabla de dibujos del juego en el 62,5 %. O sea que hay **una plantilla de 256 bytes de verdad**, repetida seis veces con un 8 % de ruido encima, y no es una casualidad de la aritmética.
+
 Y la cola de 30 bytes, que se había tratado como un asunto aparte, resulta tener **la misma firma**: alternancia estricta, alfabetos de posición par e impar sin un solo valor en común, bits fijos complementarios en cada paridad. Con 30 bytes eso podría ser casualidad y hay que decirlo; con 1536, no.
 
 ### La mejor pista: el contenido lo dicta la dirección
@@ -98,6 +104,18 @@ Esto es lo más lejos que se ha llegado, y es la pista que hay que seguir. Lo qu
 - **El bloque entero es una constante de dos bytes con bits caídos.** La palabra de 16 bits que mejor se le ajusta es **9B 54**, y las 512 palabras del bloque están a una media de **2,46 bits de ella**, de dieciséis. El azar daría 8.
 
 Y de ahí sale, por fin, la explicación de por qué 0xA600–0xA7FF y 0xAE00–0xAFFF son idénticos byte a byte: están separados por 0x800, que es múltiplo de 128, así que **tienen los mismos bits bajos de dirección**. No hacía falta que nadie copiara nada.
+
+Ahora bien, hasta dónde llega esa pista se puede medir del todo, y es lo que la pone en su sitio. Si el contenido lo dictara la dirección, cada bit del byte tendría que salir de alguna combinación de los bits de la dirección —un XOR de unos cuantos, con o sin invertir—, que es exactamente la forma de la memoria por dentro: ocho chips de un bit, y dentro de cada uno la celda guarda el valor derecho o del revés según en qué fila esté. Probando por fuerza bruta las 8192 combinaciones posibles de cada bit y quedándose con la mejor, la cuenta sale así:
+
+    la RAM de encendido: los 88 de la pantalla de carga   100,0 %
+    la RAM de encendido: los 285 del área de variables     99,3 %
+    ------------------------------------------------------------
+    LOS SOSPECHOSOS                                        85,4 %
+    ------------------------------------------------------------
+    el decorado del nivel 1, un dato de verdad             77,9 %
+    la tabla de dibujos del juego                          68,8 %
+
+La memoria recién encendida se explica **entera** con la dirección, hasta el último bit; ahí no hay contenido ninguno, solo el chip. Los sospechosos no llegan: les queda un 15 % que la dirección no explica, y eso es demasiado para ser solo memoria y demasiado poco para ser un dato normal. Están en tierra de nadie, y es la razón por la que el caso no se cierra por este lado.
 
 ### Y sin embargo, no es la basura conocida de esta cinta
 
@@ -113,6 +131,22 @@ Aquí es donde hay que frenar. La conclusión natural sería «es RAM sin inicia
     la tabla de dibujos                      50,4 %
 
 Los sospechosos encajan **igual que un dato cualquiera**, o sea nada. Si fueran la misma memoria sin inicializar de la misma máquina, tendrían que parecerse a las otras dos, y no se parecen. Así que lo que hay es esto y no más: unos bytes cuyo contenido depende de la dirección —lo cual ningún formato de datos hace— pero que no son el patrón de encendido que sí se ha identificado en el resto de la cinta. Puede que sean memoria sin inicializar de otra clase, de otro chip o de otro momento. Puede que sean otra cosa. Medido está lo que está.
+
+### Donde mejor encajan: como dibujo con su color al lado
+
+Descartar es cómodo; decir dónde *sí* encajan compromete más, y es lo que falta por contar. De todas las lecturas probadas hay una que no se cae a la primera: leerlos como **parejas**, un byte de dibujo —ocho píxeles, un bit cada uno— y detrás su byte de color, con la tinta en el nibble alto y el fondo en el bajo. Es el formato de la pantalla del MSX y es como los guardaría un editor de gráficos.
+
+Lo que sostiene esa lectura es que **los bytes impares se comportan como color mejor que la propia tabla de color del juego**. De los 768 que hay, **681 llevan el mismo fondo, el azul oscuro: el 88,7 %**; y una sola pareja de tinta y fondo, azul claro sobre azul oscuro, sale 376 veces, casi la mitad. La tabla de color de verdad de esta cinta es menos uniforme que eso: su fondo más repetido llega al 58,3 %. Y el decorado, que no es color, se queda en el 31 %. Mientras tanto los bytes pares hacen justo lo que hace un dibujo tramado: rampas donde los bits se van cayendo uno a uno, `FB`, `DB`, `BB`, `8B`.
+
+Así que se dibujan con esa lectura, que es la mejor que hay:
+
+![Los 1536 bytes leídos como parejas de dibujo y color, a lo ancho de la pantalla](../imagenes/misterio-parejas-32.png)
+
+Y al lado, para tener con qué comparar, el decorado vecino leído exactamente igual. Son bytes de la misma zona de la cinta y de esos sí se sabe lo que son:
+
+![El decorado de al lado, leído con el mismo formato](../imagenes/misterio-control.png)
+
+No sale ninguna figura, y por eso esto no cierra el caso: sale una trama de azules sobre azules que se va vaciando de izquierda a derecha. Lo cual, dicho sea de paso, es exactamente el aspecto que tendría un trozo de fondo —un cielo, un agua— recortado de una imagen más grande y sin nada dibujado encima. Es una explicación que encaja con todo lo medido, y por eso está aquí; pero encajar no es demostrar, y no hay forma de demostrarla con lo que queda en esta cinta. Haría falta el resto de la imagen, o el mismo formato de parejas apareciendo en otro sitio.
 
 ### SE BUSCA
 
@@ -133,22 +167,35 @@ Esta es la única parte del trabajo que sigue abierta, así que se publica como 
     |   SEÑAS PARTICULARES                                        |
     |     - solo 60 valores de byte distintos en 1566             |
     |     - el bit 1 encendido en los 768 bytes de posicion par   |
-    |     - cada bit con su polaridad atada a la paridad de la    |
-    |       dirección: el bit 1 la cumple al 99,2%, el 6 al 18,8% |
+    |     - una plantilla de 256 bytes repetida seis veces: se    |
+    |       aparta un bloque y los otros aciertan el 91,7% de     |
+    |       sus bits (el decorado de al lado: 48,8%)              |
     |     - los 8 únicos 0xFF en dirección impar caen los ocho    |
     |       donde los 7 bits bajos están todos a uno              |
-    |     - seis bloques de 256 bytes que solo se diferencian     |
-    |       en el 9% de sus bits (el decorado de al lado: 54%)    |
+    |     - la dirección explica el 85,4% de sus bits: mas que    |
+    |       un dato (68-78%) y menos que la memoria recien        |
+    |       encendida de esta misma cinta (99-100%)               |
     |                                                             |
     |   NO SON  código de ninguna CPU (60 valores de byte, cero   |
     |           CALL y cero RET en 1566) - dibujo de ningun       |
     |           ancho: probados 8, 16 y 32 caracteres, con        |
     |           y sin trama y desintercalando; sale               |
     |           textura, nunca una figura) -                      |
-    |           mapa - color - música - sonido digitalizado -     |
-    |           tabla de notas - copia de otra parte de la cinta  |
-    |           - la RAM de encendido que sí trae esta cinta      |
+    |           mas decorado (13 de sus 55 valores son dibujos    |
+    |           del juego; sus parejas mas repetidas salen 0      |
+    |           veces en los decorados de verdad) - música        |
+    |           (657 de 1536 bytes valen como evento del          |
+    |           reproductor; las melodias reales, 643 de 643) -   |
+    |           mapa - color - sonido digitalizado - tabla de     |
+    |           notas - copia de otra parte de la cinta -         |
+    |           la RAM de encendido que sí trae esta cinta        |
     |             (encajan al 47,7%; las otras zonas al 99-100%)  |
+    |                                                             |
+    |   LA PISTA MAS VIVA  leidos como parejas de dibujo y        |
+    |     color, 681 de sus 768 bytes impares llevan el mismo     |
+    |     fondo (88,7%): como color se portan mejor que la        |
+    |     tabla de color del juego (58,3%). Pero dibujarlos no    |
+    |     da ninguna figura: solo trama azul sobre azul.          |
     |                                                             |
     |   SE LES BUSCA VIVOS: que alguien diga qué son.             |
     |   SE LES ACEPTA MUERTOS: un «no es X, y esta es la          |
@@ -287,9 +334,10 @@ Para trastear con ellos no hace falta repetir el desmontaje. Con tu propia copia
 ```sh
 make extract
 python3 tools/extrae_misterio.py work work
+python3 tools/render_misterio.py work/CM2.raw work
 ```
 
-Eso deja `work/misterio.bin` (los 1566 seguidos), `work/misterio_mapas.bin` (los 1536 de los decorados) y `work/misterio_cola.bin` (los 30), y saca por pantalla todas las medidas de arriba para que se puedan comprobar antes de dar nada por bueno.
+Eso deja `work/misterio.bin` (los 1566 seguidos), `work/misterio_mapas.bin` (los 1536 de los decorados) y `work/misterio_cola.bin` (los 30), saca por pantalla todas las medidas de arriba —cada una con el control al lado, que es lo que les da sentido— y vuelve a dibujar las imágenes de las parejas por si quieres cambiarles el ancho o la lectura.
 
 Si crees que sabes lo que son, [abre un issue](https://github.com/antxiko/Colt36-disassembly/issues/new/choose). Lo que hace falta no es la idea —ideas hay muchas y varias eran buenas— sino la medida que la sostiene: qué habría que ver si la hipótesis fuese cierta, y qué sale al mirarlo.
 

@@ -182,6 +182,7 @@ imagenes: extracted/.stamp
 	@mkdir -p docs/imagenes
 	python3 tools/render_niveles.py work/CM2.raw docs/imagenes
 	python3 tools/render_carga.py work/scr.raw docs/imagenes/carga.png
+	python3 tools/render_misterio.py work/CM2.raw docs/imagenes
 
 # La web de GitHub Pages: ingles en docs/ y castellano en docs/es/. El diseno es
 # el compartido por la serie (tools/estilo_web.py) y las paginas salen

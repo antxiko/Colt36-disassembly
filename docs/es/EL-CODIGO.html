@@ -90,7 +90,7 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 <p><img src="../imagenes/mapa3.png" alt="El decorado completo del nivel 3, LA MINA: 32 columnas por 64 filas"></p>
 <h2 id="el-arranque-y-por-que-el-programa-no-se-puede-listar">El arranque, y por qué el programa no se puede listar</h2>
 <p>El bloque <code>CM1</code> de la cinta son 4277 bytes que se cargan en 0x83E8. Su dirección de arranque, 0x948F, cae en un recolocador de cinco instrucciones que se copia a sí mismo y a todo lo demás 1000 bytes más abajo:</p>
-<p>LD HL,0x83E8 / LD DE,0x8000 / LD BC,0x10B5 / LDIR / JP 0x9088</p>
+<pre><code>LD HL,0x83E8 / LD DE,0x8000 / LD BC,0x10B5 / LDIR / JP 0x9088</code></pre>
 <p>Carga en 0x83E8 y no directamente en 0x8000 porque mientras el juego se está cargando quien manda es el cargador de la cinta, que es a su vez un programa BASIC y vive precisamente a partir de 0x8001: cargar encima sería pisar el programa que está ejecutando el <code>BLOAD</code>.</p>
 <p>Ya en su sitio, el arranque de 0x9088 hace tres cosas: copia cinco bytes sobre el principio del programa, apunta VARTAB (0xF6C2, el puntero donde el intérprete construye su tabla de variables) a 0x8F60, y salta a 0x73AC, la rutina del intérprete que empieza a ejecutar.</p>
 <p>Esos cinco bytes son una protección. En la cinta, <b>la primera línea del programa viene numerada 65535</b>, por encima del máximo que MSX-BASIC admite, y el arranque le escribe encima el número 4. Sin ese parche el juego no funciona: comprobado en el emulador saltando por detrás de la copia, el <code>GOSUB 20</code> de la línea 520 aborta con <em>Undefined line number in 520</em>. Quien se lleve el bloque y lo cargue por su cuenta no obtiene un programa listable, sino uno roto.</p>
