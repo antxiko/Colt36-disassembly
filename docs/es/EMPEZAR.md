@@ -98,6 +98,17 @@ comentarios nuestros; 40 están en blanco y las 63 restantes son el programa del
   de entrada conocidos, comentarios que se inyectan al generar los listados y los
   rangos de datos por los que el trazador no debe pasar.
 
+### Como salen los bloques de datos
+
+Cada rango de datos declarado en las notas sale como un bloque aparte: su
+cabecera diciendo para que sirve, su etiqueta y el volcado alineado a su primer
+byte. Una linea opcional le da al bloque la anchura de fila de su estructura
+real, y eso es lo que hace legibles los cuatro niveles en el propio listado: 32
+bytes por fila es una fila del tablero, asi que los muros, las puertas y los
+objetos se ven en su sitio. Las formas de las 256 casillas y sus colores salen
+de ocho en ocho -una casilla por fila-, los escondites de cuatro en cuatro -uno
+por registro- y la tabla de notas sale en `defw`.
+
 ## Las herramientas que querrás usar
 
 **`tools/basic_detok.py`** hace y deshace la tokenización de MSX-BASIC: `detok`

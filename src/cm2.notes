@@ -62,6 +62,7 @@ B 0x9C9F ninguna otra escritura a 0xA0 ni a 0xA1.
 
 D 0x9CA5 0x9CBD variables_musica   Estado del reproductor, ya inicializado desde la cinta: la tabla de arranque del chip (4 parejas), la copia del registro 7, los tres punteros de lectura, la base de la tabla de periodos y los tres punteros de inicio
 D 0x9CBD 0x9D7D tabla_periodos     96 periodos de 16 bits, una escala cromatica completa de ocho octavas, decreciente salvo las dos ultimas entradas, que valen lo mismo porque a esa altura el redondeo a entero ya no distingue un semitono del siguiente. El primero es un DO1 (32,71 Hz) clavado. El reproductor NO empieza por el principio: su base esta en 0x9CC9, la septima entrada, asi que la nota numero 0 de las melodias es un FA#1 y las seis primeras entradas no se pueden alcanzar
+F 0x9CBD w8
 D 0x9D7D 0x9DFE melodia_canal_a    Canal A, 128 pasos y la marca de vuelta al principio. Es el bajo: nota, silencio, nota, silencio
 D 0x9DFE 0x9E7F melodia_canal_b    Canal B, 128 pasos. El acompanamiento
 D 0x9E7F 0xA000 melodia_canal_c    Canal C, 384 pasos, que son exactamente tres vueltas de los otros dos: asi los tres coinciden al repetir, sin desfase. Los ultimos 128 pasos son silencio. El bajo arpegia FA#-LA#-DO# y luego SI-RE#, o sea que la pieza esta en modo mayor, entre FA# y SI
@@ -81,11 +82,15 @@ B 0xA000 solo el 3 y el 4 gastan las 64. Lo que sobra se copia igual,
 B 0xA000 pero no se llega a ver nunca.
 
 D 0xA000 0xA400 nivel_1        EL ALMACEN. 32 filas utiles
+F 0xA000 32
 D 0xA400 0xA800 nivel_1_resto  Los 1024 bytes que le sobran al nivel 1. Se copian al area de trabajo pero el tope del scroll impide llegar a verlos. No se ha conseguido identificar de que son: no son mapa, ni dibujos, ni color, ni musica, ni copia de nada de la cinta
 D 0xA800 0xAE00 nivel_2        EL CANON. 48 filas utiles
+F 0xA800 32
 D 0xAE00 0xB000 nivel_2_resto  Los 512 que le sobran al nivel 2, byte a byte iguales a la segunda mitad del sobrante del nivel 1: los dos se grabaron desde el mismo sitio sin limpiarlo
 D 0xB000 0xB800 nivel_3        LA MINA. Usa las 64 filas
+F 0xB000 32
 D 0xB800 0xC000 nivel_4        EL SALOON. Usa las 64 filas
+F 0xB800 32
 
 B 0xC000 ############################################################
 B 0xC000 LOS DIBUJOS
@@ -113,13 +118,21 @@ B 0xC000     174 en adelante  los bandidos, en bloques de 2x2
 B 0xC000     255        la casilla vacia, la mas frecuente del decorado
 
 D 0xC000 0xC800 dibujos        Las formas de las 256 casillas, ocho bytes cada una
+F 0xC000 8
 D 0xC800 0xD000 colores        Los colores de esas casillas: tinta y fondo por linea
+F 0xC800 8
 D 0xD000 0xD300 pantalla_titulo  Las 24 filas de la portada. El BASIC le anade encima dos rotulos (TOPO SOFTWARE y MUSICA:GOMINOLAS) con su linea 575
+F 0xD000 32
 D 0xD300 0xD400 marcador       Las ocho filas de abajo, que no se mueven. Vienen grabadas con VIDAS:5 y con SEIS ceros de puntuacion, pero el programa solo escribe cuatro cifras: por eso la puntuacion se lee multiplicada por cien
+F 0xD300 32
 D 0xD400 0xD600 decorado_suelto  Dieciseis filas que dibujan una escena coherente -dos plataformas con botellas verdes y una empalizada larga, con ocho objetos de los que se rompen- pero a las que el programa no hace ninguna referencia: en todo el listado no hay ni una constante entre 0xD400 y 0xD5FF. Un trozo descartado que se quedo en el fichero. Los ultimos 128 bytes son ceros
+F 0xD400 32
 D 0xD600 0xD800 fila_en_blanco   32 casillas vacias, que el programa usa para borrar la zona de juego fila a fila antes de anunciar el nivel. Los 480 bytes siguientes son mas de lo mismo y no los usa nadie
+F 0xD600 32
 D 0xD800 0xD900 sprites        Los ocho sprites de 16x16: las dos capas de la mira, el fogonazo del disparo, la mosca de la portada y los ojos que la siguen
+F 0xD800 8
 D 0xD900 0xD9A0 escondites     Diez escondites por nivel, cuatro bytes cada uno: fila, columna, modelo de bandido y retardo de salida. El programa elige uno al azar cada vez (su linea 760), asi que los 16 bandidos de un nivel salen de estas diez posiciones
+F 0xD900 4
 D 0xD9A0 0xD9E0 recorte_olvidado  Copia literal de las formas y los colores de las casillas 170 a 173, que son el primer fotograma del primer modelo de bandido: un fotograma que ni siquiera llega a dibujarse. Nadie lee esto
 D 0xD9E0 0xDA00 parametros     Los seis bytes por los que el BASIC le pasa a las rutinas de copia el cuanto, el adonde y el desde donde. Vienen grabados con los valores de la linea 572, o sea que la cinta se hizo desde una sesion viva parada en la portada
 D 0xDA00 0xE200 area_trabajo   Donde se copia el decorado del nivel en curso, y sobre el que el juego escribe: los bandidos que asoman y los objetos que se rompen. En la cinta trae una copia exacta del nivel 1, poso de la memoria del autor al grabar

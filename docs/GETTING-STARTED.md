@@ -98,6 +98,17 @@ project's comments: it is not MSX-BASIC syntax, the tokeniser ignores it, and so
   points, comments that get injected when the listings are generated, and the
   data ranges the tracer must not walk into.
 
+### How the data blocks are laid out
+
+Every data range declared in the notes comes out as a block of its own: its own
+heading saying what it is for, its own label, and the dump aligned to its first
+byte. An optional line gives the block the row width of its real structure, and
+that is what makes the four levels readable in the listing itself: 32 bytes per
+row is one row of the board, so the walls, the doors and the objects can be seen
+in place. The 256 cell shapes and their colours go eight bytes at a time -one
+cell per row-, the hiding places four -one per record-, and the note table comes
+out as `defw`.
+
 ## The tools you will want to use
 
 **`tools/basic_detok.py`** does and undoes MSX-BASIC tokenisation: `detok` pulls
