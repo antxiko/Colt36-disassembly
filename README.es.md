@@ -46,7 +46,7 @@ nombre y explicación. Existe porque la reproducibilidad no ve los errores de
 interpretación: si unos gráficos se marcaran como código, los bytes seguirían
 saliendo idénticos y el único que mentiría sería el listado.
 
-Y **58 tests**, buena parte de ellos dedicados a comprobar que lo que dice la
+Y **65 tests**, buena parte de ellos dedicados a comprobar que lo que dice la
 documentación es lo que hace el juego.
 
 ## SE BUSCAN 1566 bytes, vivos o muertos
