@@ -35,11 +35,11 @@ porque los listados podrían no corresponder. Dentro hay 34 239 bytes de conteni
 en cinco bloques.
 
 Sin ella se puede hacer bastante. Los listados de `src/` van en el repositorio y
-se leen sin más. Y de los 65 tests, **26 pasan en un clon recién
+se leen sin más. Y de los 65 tests, **25 pasan en un clon recién
 bajado**: los que contrastan el listado del juego con lo que dice la
 documentación —que a la línea 730 no salta nadie, o que las direcciones
 publicadas de las rutinas en código máquina son las que el juego declara con
-`DEFUSR`—. Los otros 39 se saltan solos indicando por qué.
+`DEFUSR`—. Los otros 40 se saltan solos indicando por qué.
 
 ## Qué hace `make`
 

@@ -1,6 +1,6 @@
 # Bytes muertos
 
-Un desensamblado no termina cuando el código se entiende: termina cuando cada byte de la cinta tiene dueño. En Colt 36 el reparto cierra al 100% —34 239 bytes de contenido, 34 239 explicados—, pero una parte de ese contenido no llega nunca a la pantalla. Conviene separar dos cosas que es facil confundir: hay bytes que **no lee nadie**, ni una sola instruccion, y hay bytes que **si se leen y se copian pero no se ven jamas**. Los del sobrante de los mapas son de los segundos, y mas abajo se explica exactamente por que. Sumando solo los trozos que se cuentan aquí salen **3263 bytes muertos**; si se añaden los 2048 del área de trabajo y 145 de relleno, son **5456 bytes de 34 239, casi el 16% de la cinta**.
+Un desensamblado no termina cuando el código se entiende: termina cuando cada byte de la cinta tiene dueño. En Colt 36 el reparto cierra al 100% —34 239 bytes de contenido, 34 239 explicados—, pero una parte de ese contenido no llega nunca a la pantalla. Conviene separar dos cosas que es facil confundir: hay bytes que **no lee nadie**, ni una sola instruccion, y hay bytes que **si se leen y se copian pero no se ven jamas**. Los del sobrante de los mapas son de los segundos, y mas abajo se explica exactamente por que. Sumando solo los trozos que se cuentan aquí salen **3263 bytes muertos**; si se añaden los 2048 del área de trabajo y los pellizcos de relleno —138 en el cargador BASIC y unos pocos sueltos más—, son **5456 bytes de 34 239, casi el 16% de la cinta**.
 
 ## Los 297 bytes del área de variables
 

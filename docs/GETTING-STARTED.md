@@ -36,11 +36,11 @@ and carries on, because the listings might not correspond. Inside there are
 34 239 bytes of content in five blocks.
 
 Without it you can still do a fair amount. The listings in `src/` are in the
-repository and can simply be read. And of the 65 tests, **26 pass on a fresh
+repository and can simply be read. And of the 65 tests, **25 pass on a fresh
 clone**: the ones that check the game listing against what the documentation
 says —that nobody jumps to line 730, or that the published addresses of the
 machine-code routines are the ones the game declares with `DEFUSR`—. The other
-39 skip themselves and state why.
+40 skip themselves and state why.
 
 ## What `make` does
 

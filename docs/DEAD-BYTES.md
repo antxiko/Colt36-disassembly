@@ -1,6 +1,6 @@
 # Dead bytes
 
-A disassembly isn't finished when the code makes sense: it's finished when every byte on the tape has an owner. In Colt 36 the accounting closes at 100% —34,239 bytes of content, 34,239 explained— but part of that content never reaches the screen. Two things are worth keeping apart, because they are easy to confuse: some bytes are **read by nothing at all**, not one instruction, and some **are read and copied but never seen**. The leftovers of the maps are the second kind, and exactly why is explained below. Counting only the pieces listed here gives **3263 dead bytes**; add the 2048 of the work area and 145 of padding and it comes to **5456 bytes out of 34,239, almost 16% of the tape**.
+A disassembly isn't finished when the code makes sense: it's finished when every byte on the tape has an owner. In Colt 36 the accounting closes at 100% —34,239 bytes of content, 34,239 explained— but part of that content never reaches the screen. Two things are worth keeping apart, because they are easy to confuse: some bytes are **read by nothing at all**, not one instruction, and some **are read and copied but never seen**. The leftovers of the maps are the second kind, and exactly why is explained below. Counting only the pieces listed here gives **3263 dead bytes**; add the 2048 of the work area and the scraps of padding —138 in the BASIC loader and a handful elsewhere— and it comes to **5456 bytes out of 34,239, almost 16% of the tape**.
 
 ## The 297 bytes of the variable area
 
