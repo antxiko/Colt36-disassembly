@@ -1,6 +1,6 @@
 # Dead bytes
 
-A disassembly isn't finished when the code makes sense: it's finished when every byte on the tape has an owner. In Colt 36 the accounting closes at 100% —34,239 bytes of content, 34,239 explained— but part of that content never reaches the screen. Two things are worth keeping apart, because they are easy to confuse: some bytes are **read by nothing at all**, not one instruction, and some **are read and copied but never seen**. The leftovers of the maps are the second kind, and exactly why is explained below. Counting only the pieces listed here gives **3263 dead bytes**; add the 2048 of the work area and the odd scrap of padding and it comes to **5456 bytes out of 34,239, almost 16% of the tape**.
+A disassembly isn't finished when the code makes sense: it's finished when every byte on the tape has an owner. In Colt 36 the accounting closes at 100% —34,239 bytes of content, 34,239 explained— but part of that content never reaches the screen. Two things are worth keeping apart, because they are easy to confuse: some bytes are **read by nothing at all**, not one instruction, and some **are read and copied but never seen**. The leftovers of the maps are the second kind, and exactly why is explained below. Counting only the pieces listed here gives **3263 dead bytes**; add the 2048 of the work area and 145 of padding and it comes to **5456 bytes out of 34,239, almost 16% of the tape**.
 
 ## The 297 bytes of the variable area
 
@@ -339,9 +339,3 @@ python3 tools/render_misterio.py work/CM2.raw work
 That leaves `work/misterio.bin` (all 1566), `work/misterio_mapas.bin` (the 1536 from the scenery) and `work/misterio_cola.bin` (the 30), prints every measurement above —each one with its control beside it, which is what makes it mean anything— and redraws the pair images in case you want to change their width or the reading.
 
 If you think you know what they are, [open an issue](https://github.com/antxiko/Colt36-disassembly/issues/new/choose). What's needed isn't the idea — there have been plenty, and several were good — but the measurement behind it: what you would have to see if the hypothesis were true, and what comes out when you look.
-
-## Why this gets written down
-
-Because the byte budget only closes if every byte has an owner, and "I don't know" is an owner with a name to it. A gap you keep quiet about fills itself, and what fills it is usually a plausible explanation nobody has measured. Writing "rubbish" and moving on is comfortable; writing down *what* was measured, what figure it gave and what it was compared against lets someone else repeat the test and prove the conclusion wrong.
-
-And because dead bytes are the best physical evidence a tape leaves behind. The uninitialised-RAM pattern says the game was written at 0x8000. The six parameter bytes at 0xD9E1 come recorded with 768, 6144 and 0xD000, which are exactly the values in line 572, the one that draws the title screen. The work area carries an exact copy of the level 1 map. Nobody saved that on purpose: the tape was cut from a live session, sitting on the title screen, with the residue of the last game still in memory. You don't learn that by reading the code. You learn it by reading what's left over.

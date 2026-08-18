@@ -12,6 +12,7 @@ sin servidor.
 
 La inglesa se escribe en docs/index.html y la castellana en docs/es/index.html.
 """
+import tempfile
 import base64
 import os
 import sys
@@ -20,6 +21,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from estilo_web import ESTILO          # noqa: E402
 from render_maps import PALETA, png    # noqa: E402
 from render_niveles import portada     # noqa: E402
+
+# El temporal del sistema: en Windows no hay /tmp.
+TMP = tempfile.gettempdir()
 
 REPO = "https://github.com/antxiko/Colt36-disassembly"
 
@@ -289,7 +293,7 @@ def main(binpath, imgdir, out, idioma="en"):
     t = T[idioma]
 
     w, h, im = recorta_rotulo(d)
-    png("/tmp/_c36_logo.png", w, h, im)
+    png(f"{TMP}/_c36_logo.png", w, h, im)
 
     hallazgos = "".join(f'<div class="hall"><h3>{tit}</h3>{cuerpo}</div>'
                         for tit, cuerpo in HALLAZGOS[idioma])
@@ -321,7 +325,7 @@ def main(binpath, imgdir, out, idioma="en"):
 <style>{ESTILO}</style>
 <div class="w">
 <header class="top">
-  {img("/tmp/_c36_logo.png", "Colt 36")}
+  {img(f"{TMP}/_c36_logo.png", "Colt 36")}
   <p class="claim">{t["claim"]}</p>
   <div class="ficha">{"".join(f"<span>{x}</span>" for x in t["ficha"])}</div>
 </header>

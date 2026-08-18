@@ -52,7 +52,7 @@ Carga en 0x83E8 y no directamente en 0x8000 porque mientras el juego se está ca
 
 Ya en su sitio, el arranque de 0x9088 hace tres cosas: copia cinco bytes sobre el principio del programa, apunta VARTAB (0xF6C2, el puntero donde el intérprete construye su tabla de variables) a 0x8F60, y salta a 0x73AC, la rutina del intérprete que empieza a ejecutar.
 
-Esos cinco bytes son una protección. En la cinta, **la primera línea del programa viene numerada 65535**, por encima del máximo que MSX-BASIC admite, y el arranque le escribe encima el número 4. Sin ese parche el juego no funciona: comprobado en el emulador saltando por detrás de la copia, el `GOSUB 20` de la línea 520 aborta con *Undefined line number in 520*. Quien se lleve el bloque y lo cargue por su cuenta no obtiene un programa listable, sino uno roto.
+Esos cinco bytes son la protección: renumeran la primera línea del programa, que en la cinta es la 65535. Ver [Una línea numerada 65535](HALLAZGOS.html#una-linea-numerada-65535).
 
 Y lo primero que hace esa línea recién numerada remata la idea: `POKE &HFBB1,1`. Esa posición es BASROM, con la que el sistema decide si CTRL+STOP puede interrumpir. Puesta a 1, el juego ya no se puede parar; y si no se puede parar, no se puede listar.
 

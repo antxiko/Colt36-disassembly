@@ -52,7 +52,7 @@ It loads at 0x83E8 rather than straight to 0x8000 because while the game is load
 
 Once in place, the startup at 0x9088 does three things: it copies five bytes over the beginning of the program, points VARTAB (0xF6C2, the pointer where the interpreter builds its variable table) at 0x8F60, and jumps to 0x73AC, the interpreter routine that starts executing.
 
-Those five bytes are a protection. On tape, **the first line of the program is numbered 65535**, above the maximum MSX-BASIC allows, and the startup writes the number 4 over it. Without that patch the game does not work: verified in the emulator by jumping in past the copy, the `GOSUB 20` on line 520 aborts with *Undefined line number in 520*. Anyone who lifts the block and loads it on their own gets not a listable program but a broken one.
+Those five bytes are the protection: they renumber the program's first line, which on tape is 65535. See [A line numbered 65535](FINDINGS.html#a-line-numbered-65535).
 
 And the first thing that freshly numbered line does finishes the job: `POKE &HFBB1,1`. That address is BASROM, which the system uses to decide whether CTRL+STOP can interrupt. Set to 1, the game can no longer be stopped; and if it cannot be stopped, it cannot be listed.
 

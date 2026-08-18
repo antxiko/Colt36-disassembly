@@ -1,6 +1,6 @@
 # Bytes muertos
 
-Un desensamblado no termina cuando el código se entiende: termina cuando cada byte de la cinta tiene dueño. En Colt 36 el reparto cierra al 100% —34 239 bytes de contenido, 34 239 explicados—, pero una parte de ese contenido no llega nunca a la pantalla. Conviene separar dos cosas que es facil confundir: hay bytes que **no lee nadie**, ni una sola instruccion, y hay bytes que **si se leen y se copian pero no se ven jamas**. Los del sobrante de los mapas son de los segundos, y mas abajo se explica exactamente por que. Sumando solo los trozos que se cuentan aquí salen **3263 bytes muertos**; si se añaden los 2048 del área de trabajo y los pellizcos de relleno, son **5456 bytes de 34 239, casi el 16% de la cinta**.
+Un desensamblado no termina cuando el código se entiende: termina cuando cada byte de la cinta tiene dueño. En Colt 36 el reparto cierra al 100% —34 239 bytes de contenido, 34 239 explicados—, pero una parte de ese contenido no llega nunca a la pantalla. Conviene separar dos cosas que es facil confundir: hay bytes que **no lee nadie**, ni una sola instruccion, y hay bytes que **si se leen y se copian pero no se ven jamas**. Los del sobrante de los mapas son de los segundos, y mas abajo se explica exactamente por que. Sumando solo los trozos que se cuentan aquí salen **3263 bytes muertos**; si se añaden los 2048 del área de trabajo y 145 de relleno, son **5456 bytes de 34 239, casi el 16% de la cinta**.
 
 ## Los 297 bytes del área de variables
 
@@ -340,9 +340,3 @@ python3 tools/render_misterio.py work/CM2.raw work
 Eso deja `work/misterio.bin` (los 1566 seguidos), `work/misterio_mapas.bin` (los 1536 de los decorados) y `work/misterio_cola.bin` (los 30), saca por pantalla todas las medidas de arriba —cada una con el control al lado, que es lo que les da sentido— y vuelve a dibujar las imágenes de las parejas por si quieres cambiarles el ancho o la lectura.
 
 Si crees que sabes lo que son, [abre un issue](https://github.com/antxiko/Colt36-disassembly/issues/new/choose). Lo que hace falta no es la idea —ideas hay muchas y varias eran buenas— sino la medida que la sostiene: qué habría que ver si la hipótesis fuese cierta, y qué sale al mirarlo.
-
-## Por qué esto se cuenta
-
-Porque el presupuesto de bytes solo cierra si cada uno tiene dueño, y «no lo sé» es un dueño con nombre y apellidos. El hueco que se calla se llena solo, y lo que lo llena suele ser una explicación verosímil que nadie ha medido. Escribir «basura» y seguir es cómodo; escribir *qué* medida se hizo, con qué cifra salió y contra qué se comparó permite que otro repita la prueba y desmienta la conclusión.
-
-Y porque los bytes muertos son la mejor prueba material que deja una cinta. El patrón de la RAM sin inicializar dice que el juego se escribió en 0x8000. Los seis bytes de parámetros de 0xD9E1 vienen grabados con 768, 6144 y 0xD000, que son exactamente los valores de la línea 572, la que pinta la portada. El área de trabajo trae una copia exacta del mapa del nivel 1. Nadie grabó eso a propósito: la cinta se cortó de una sesión viva, parada en la pantalla de título, con el poso de la última partida todavía en memoria. Eso no se sabe leyendo el código. Se sabe leyendo lo que sobra.
