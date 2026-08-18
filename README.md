@@ -47,7 +47,7 @@ explanation. It exists because reproducibility cannot see misinterpretation — 
 graphics were marked as code, the bytes would still come out identical and only
 the listing would lie.
 
-And **65 tests**, many of them dedicated to checking that what the documentation
+And **66 tests**, many of them dedicated to checking that what the documentation
 says is what the game does.
 
 ## WANTED: 1566 bytes, dead or alive
