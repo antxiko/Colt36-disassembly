@@ -49,7 +49,7 @@ T = {
         otro=("es/", "En castellano"),
         h_num="The game in numbers", h_find="What turned up when we took it apart",
         h_scr="The four levels", h_met="How it was done",
-        cifras=[("100%", "of the binary accounted for"), ("65", "routines identified"),
+        cifras=[("100%", "of the binary accounted for"), ("65", "routines and tables named"),
                 ("4", "level maps"), ("4,932", "bytes of code"),
                 ("29,307", "bytes of data"), ("1,566", "bytes unidentified")],
         nota_num="Those bytes of code are not what you would expect. Only "
@@ -86,7 +86,7 @@ T = {
         otro=("../", "In English"),
         h_num="El juego en cifras", h_find="Lo que apareció al desmontarlo",
         h_scr="Los cuatro niveles", h_met="Cómo se hizo",
-        cifras=[("100%", "del binario explicado"), ("65", "rutinas identificadas"),
+        cifras=[("100%", "del binario explicado"), ("65", "rutinas y tablas bautizadas"),
                 ("4", "mapas de nivel"), ("4.932", "bytes de código"),
                 ("29.307", "bytes de datos"), ("1.566", "bytes sin identificar")],
         nota_num="Esos bytes de código no son lo que uno espera. Solo "
