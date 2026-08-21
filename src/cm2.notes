@@ -49,7 +49,34 @@ C 0x9BE3 la base de la tabla de periodos, guardada en RAM
 C 0x9BF7 quita el bit del canal A: vuelve a sonar
 C 0x9C03 avanza el puntero del canal para el paso siguiente
 C 0x9C07 ---- canal B: lo mismo con sus punteros y sus registros ----
-C 0x9C4E ---- canal C ----
+C 0x9C4E avanza el puntero del canal B, igual que 0x9C03 hizo con el A
+C 0x9C52 ---- canal C ----
+
+C 0x9C24 la marca de silencio: el canal B se queda mudo hasta el paso siguiente
+C 0x9C28 el numero de nota por dos, que la tabla de periodos es de palabras
+C 0x9C2E la misma tabla de periodos que el canal A: la base vive en 0x9CB5
+C 0x9C32 R2 y R3 son el tono del canal B, lo que R0 y R1 son del A
+C 0x9C3F quita el bit 1 de la copia del registro 7 y el canal B vuelve a sonar
+C 0x9C48 R7 es el mezclador, y se escribe entero desde la copia de 0x9CAE
+C 0x9C4D recupera el puntero de lectura, que el `push` de 0x9C2D aparto
+
+C 0x9C55 el bit 2 de la copia del registro 7 enmudece el canal C
+C 0x9C63 el byte que toca en la partitura del canal C
+C 0x9C64 la marca de fin: 0x9CBB tiene el principio de esta partitura
+C 0x9C6E y se relee el primer byte de la partitura rebobinada
+
+C 0x9C6F la marca de silencio, tambien para el C
+C 0x9C73 y otra vez la nota por dos para indexar la tabla
+C 0x9C7D R4 y R5 son el tono del canal C
+C 0x9C8A quita el bit 2: el canal C vuelve a sonar
+C 0x9C98 recupera el puntero, apartado en 0x9C78
+C 0x9C99 avanza el puntero del canal C y con eso se acaba el paso
+
+C 0xE313 el numero de bytes, que la subrutina 20 del BASIC deja en 0xD9E1
+C 0xE316 a BC, que es lo que cuenta el LDIR
+C 0xE318 el destino, en 0xD9E3
+C 0xE31D y el origen, en 0xD9E5: es el ultimo que se lee, y el unico que el scroll reescribe
+C 0xE320 aqui no hay BIOS que valga: RAM a RAM y en el mismo bloque
 C 0x9C9D vuelve al BASIC, que llamara otra vez en la vuelta siguiente
 
 L 0x9C9F escribe_psg   Escribe el registro A del chip de sonido con el valor C

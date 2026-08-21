@@ -121,69 +121,69 @@ L_9C03:
 	ld (09cb1h),hl		;9c20
 	ld a,(hl)			;9c23
 L_9C24:
-	cp 0ffh		;9c24
+	cp 0ffh		;9c24   ; la marca de silencio: el canal B se queda mudo hasta el paso siguiente
 	jr z,L_9C4E		;9c26
-	sla a		;9c28
+	sla a		;9c28   ; el numero de nota por dos, que la tabla de periodos es de palabras
 	ld d,000h		;9c2a
 	ld e,a			;9c2c
 	push hl			;9c2d
-	ld hl,(09cb5h)		;9c2e
+	ld hl,(09cb5h)		;9c2e   ; la misma tabla de periodos que el canal A: la base vive en 0x9CB5
 	add hl,de			;9c31
-	ld a,002h		;9c32
+	ld a,002h		;9c32   ; R2 y R3 son el tono del canal B, lo que R0 y R1 son del A
 	ld c,(hl)			;9c34
 	call escribe_psg		;9c35
 	ld a,003h		;9c38
 	inc hl			;9c3a
 	ld c,(hl)			;9c3b
 	call escribe_psg		;9c3c
-	ld a,(09caeh)		;9c3f
+	ld a,(09caeh)		;9c3f   ; quita el bit 1 de la copia del registro 7 y el canal B vuelve a sonar
 	and 0fdh		;9c42
 	ld (09caeh),a		;9c44
 	ld c,a			;9c47
-	ld a,007h		;9c48
+	ld a,007h		;9c48   ; R7 es el mezclador, y se escribe entero desde la copia de 0x9CAE
 	call escribe_psg		;9c4a
-	pop hl			;9c4d
+	pop hl			;9c4d   ; recupera el puntero de lectura, que el `push` de 0x9C2D aparto
 L_9C4E:
-	inc hl			;9c4e   ; ---- canal C ----
+	inc hl			;9c4e   ; avanza el puntero del canal B, igual que 0x9C03 hizo con el A
 	ld (09cb1h),hl		;9c4f
-	ld hl,(09cb3h)		;9c52
-	ld a,(09caeh)		;9c55
+	ld hl,(09cb3h)		;9c52   ; ---- canal C ----
+	ld a,(09caeh)		;9c55   ; el bit 2 de la copia del registro 7 enmudece el canal C
 	or 004h		;9c58
 	ld (09caeh),a		;9c5a
 	ld c,a			;9c5d
 	ld a,007h		;9c5e
 	call escribe_psg		;9c60
-	ld a,(hl)			;9c63
-	cp 0feh		;9c64
+	ld a,(hl)			;9c63   ; el byte que toca en la partitura del canal C
+	cp 0feh		;9c64   ; la marca de fin: 0x9CBB tiene el principio de esta partitura
 	jr nz,L_9C6F		;9c66
 	ld hl,(09cbbh)		;9c68
 	ld (09cb3h),hl		;9c6b
-	ld a,(hl)			;9c6e
+	ld a,(hl)			;9c6e   ; y se relee el primer byte de la partitura rebobinada
 L_9C6F:
-	cp 0ffh		;9c6f
+	cp 0ffh		;9c6f   ; la marca de silencio, tambien para el C
 	jr z,L_9C99		;9c71
-	sla a		;9c73
+	sla a		;9c73   ; y otra vez la nota por dos para indexar la tabla
 	ld d,000h		;9c75
 	ld e,a			;9c77
 	push hl			;9c78
 	ld hl,(09cb5h)		;9c79
 	add hl,de			;9c7c
-	ld a,004h		;9c7d
+	ld a,004h		;9c7d   ; R4 y R5 son el tono del canal C
 	ld c,(hl)			;9c7f
 	call escribe_psg		;9c80
 	ld a,005h		;9c83
 	inc hl			;9c85
 	ld c,(hl)			;9c86
 	call escribe_psg		;9c87
-	ld a,(09caeh)		;9c8a
+	ld a,(09caeh)		;9c8a   ; quita el bit 2: el canal C vuelve a sonar
 	and 0fbh		;9c8d
 	ld (09caeh),a		;9c8f
 	ld c,a			;9c92
 	ld a,007h		;9c93
 	call escribe_psg		;9c95
-	pop hl			;9c98
+	pop hl			;9c98   ; recupera el puntero, apartado en 0x9C78
 L_9C99:
-	inc hl			;9c99
+	inc hl			;9c99   ; avanza el puntero del canal C y con eso se acaba el paso
 	ld (09cb3h),hl		;9c9a
 	ei			;9c9d   ; vuelve al BASIC, que llamara otra vez en la vuelta siguiente
 	ret			;9c9e
@@ -1610,14 +1610,14 @@ DATA_relleno:
 ; pueda repetir el nivel al perder una vida.
 ; ----------------------------------------------------------------------
 usr2:		; DEFUSR2: lo mismo pero de RAM a RAM
-	ld hl,(0d9e1h)		;e313
-	ld b,h			;e316
+	ld hl,(0d9e1h)		;e313   ; el numero de bytes, que la subrutina 20 del BASIC deja en 0xD9E1
+	ld b,h			;e316   ; a BC, que es lo que cuenta el LDIR
 	ld c,l			;e317
-	ld hl,(0d9e3h)		;e318
+	ld hl,(0d9e3h)		;e318   ; el destino, en 0xD9E3
 	ld d,h			;e31b
 	ld e,l			;e31c
-	ld hl,(0d9e5h)		;e31d
-	ldir		;e320
+	ld hl,(0d9e5h)		;e31d   ; y el origen, en 0xD9E5: es el ultimo que se lee, y el unico que el scroll reescribe
+	ldir		;e320   ; aqui no hay BIOS que valga: RAM a RAM y en el mismo bloque
 	ret			;e322
 
 ; ----------------------------------------------------------------------
