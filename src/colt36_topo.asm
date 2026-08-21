@@ -33,240 +33,240 @@ l94f3h:	equ 0x094f3
 ; Verificado en openMSX: el juego pasa por 0x9470 a los 69,7 s
 ; de empezar a cargar la cinta.
 ; ----------------------------------------------------------------------
-topo_inicio:		; Punto de entrada: el exec que declara la cabecera BIN
-	jp L_95D1		;9470   ; aqui solo hay un salto; el codigo util empieza mas adelante
-topo_anima:		; La animacion del logo
-	ld hl,02f78h		;9473
-	ld de,02fb8h		;9476
-	ld bc,000f7h		;9479
+TOPO_START:		; Punto de entrada (BLOAD ,R)
+	jp TOPO_MAIN		;9470   ; El codigo util empieza mas adelante; esto solo salta alli
+CORRE_EL_COLOR:		; Corre el color por las dos bandas del recuadro de abajo, de izquierda a derecha; no anima el logo. La llama TOPO_MAIN desde 0x95FA
+	ld hl,02f78h		;9473   ; Primera celda de color que se retoca
+	ld de,02fb8h		;9476   ; Y la ultima, ocho caracteres mas alla
+	ld bc,000f7h		;9479   ; Salto a la segunda banda: con los ocho bytes que ya avanzo PINTA_CELDA son 255, uno menos que la fila de caracteres entera
 L_947C:
-	and a			;947c   ; compara HL con DE para saber si el recorrido ha terminado
+	and a			;947c   ; Compara HL con DE para saber si ha llegado al final del recorrido
 	sbc hl,de		;947d
 	ret z			;947f
 	add hl,de			;9480
-	ld a,081h		;9481
-	call L_94A6		;9483
+	ld a,081h		;9481   ; Rojo sobre negro en la banda de arriba
+	call PINTA_CELDA		;9483
 	push hl			;9486
-	add hl,bc			;9487
+	add hl,bc			;9487   ; La misma columna, en la de abajo
 	ld a,081h		;9488
-	call L_94A6		;948a
+	call PINTA_CELDA		;948a
 	pop hl			;948d
 	push hl			;948e
-	ld a,0f1h		;948f
-	call L_94A6		;9491
+	ld a,0f1h		;948f   ; Y blanco sobre negro una celda mas a la derecha
+	call PINTA_CELDA		;9491
 	add hl,bc			;9494
 	ld a,0f1h		;9495
-	call L_94A6		;9497
+	call PINTA_CELDA		;9497
 	pop hl			;949a
-	ei			;949b
+	ei			;949b   ; La interrupcion, solo para poder esperar
 	push bc			;949c
 	ld b,003h		;949d
 L_949F:
-	halt			;949f   ; espera tres barridos de pantalla: asi se temporiza la animacion
+	halt			;949f   ; Espera 3 interrupciones de barrido: asi se temporiza la animacion
 	djnz L_949F		;94a0
 	pop bc			;94a2
 	di			;94a3
-	jr L_947C		;94a4
-L_94A6:
+	jr L_947C		;94a4   ; Otra celda: el color va corriendo hacia la derecha
+PINTA_CELDA:		; Escribe A en ocho bytes seguidos de VRAM: el color de un caracter entero
 	push bc			;94a6
-	ld b,008h		;94a7
+	ld b,008h		;94a7   ; Ocho bytes: los ocho scanlines de un caracter
 L_94A9:
 	call 0004dh		;94a9   ; BIOS WRTVRM - Writes data in VRAM
 	inc hl			;94ac
 	djnz L_94A9		;94ad
 	pop bc			;94af
 	ret			;94b0
-L_94B1:
-	ld hl,0000dh		;94b1
-	add hl,hl			;94b4
+DIBUJA_TROZO:		; Vuelca un trozo del logo a la VRAM. Los tres parametros van parcheados en el propio codigo
+	ld hl,0000dh		;94b1   ; La fila por la que empezar. El 0x0D lo parchea quien llama
+	add hl,hl			;94b4   ; Por dos, que tabla_vram es de palabras
 	ld de,096f8h		;94b5
 	add hl,de			;94b8
-	ld (096f6h),hl		;94b9
-	ld hl,0000eh		;94bc
+	ld (096f6h),hl		;94b9   ; Guarda el puntero a la entrada de tabla_vram
+	ld hl,0000eh		;94bc   ; El numero de trozo, tambien parcheado
 	add hl,hl			;94bf
-	ld de,09694h		;94c0
+	ld de,09694h		;94c0   ; Su posicion dentro de los dibujos
 	add hl,de			;94c3
 	ld e,(hl)			;94c4
 	inc hl			;94c5
 	ld d,(hl)			;94c6
-	ld hl,09728h		;94c7
+	ld hl,09728h		;94c7   ; Principio del trozo; los dos primeros bytes son la cabecera
 	add hl,de			;94ca
-	ld a,(hl)			;94cb
+	ld a,(hl)			;94cb   ; El ancho en bytes, al contador del bucle interior
 	ld (094f1h),a		;94cc
 	inc hl			;94cf
-	ld a,(hl)			;94d0
+	ld a,(hl)			;94d0   ; Y las filas, al del exterior
 	ld (094ddh),a		;94d1
 	inc hl			;94d4
-	ld (096f4h),hl		;94d5
-	ld ix,(096f6h)		;94d8
-	ld c,005h		;94dc
+	ld (096f4h),hl		;94d5   ; Aqui empiezan los datos
+	ld ix,(096f6h)		;94d8   ; La entrada de tabla_vram por la que empezar
+	ld c,005h		;94dc   ; Cuantas filas (parcheado desde la cabecera)
 L_94DE:
-	ld e,(ix+000h)		;94de
+	ld e,(ix+000h)		;94de   ; Direccion de la fila, sacada de tabla_vram
 	inc ix		;94e1
 	ld d,(ix+000h)		;94e3
 	inc ix		;94e6
-	ld hl,000b0h		;94e8
+	ld hl,000b0h		;94e8   ; La columna, en bytes: tambien parcheada
 	add hl,de			;94eb
-	ld de,(096f4h)		;94ec
-	ld b,018h		;94f0
+	ld de,(096f4h)		;94ec   ; El puntero al dibujo, donde lo dejo la fila anterior
+	ld b,018h		;94f0   ; Bytes de esta fila (parcheado desde la cabecera)
 L_94F2:
 	ld a,(de)			;94f2
 L_94F3:
-	nop			;94f3
+	nop			;94f3   ; Byte parcheable: nop pisa lo que hubiera, `or (hl)` lo superpone a la copia de 0xC000
 	inc de			;94f4
-	res 7,h		;94f5
+	res 7,h		;94f5   ; Sin los bits 14 y 15, la direccion de la tabla es la de VRAM
 	res 6,h		;94f7
 	call 0004dh		;94f9   ; BIOS WRTVRM - Writes data in VRAM
 	inc hl			;94fc
-	set 6,h		;94fd
+	set 6,h		;94fd   ; Y con ellos vuelve a apuntar a la copia en RAM
 	set 7,h		;94ff
 	djnz L_94F2		;9501
-	ld (096f4h),de		;9503
-	dec c			;9507
+	ld (096f4h),de		;9503   ; Deja el puntero listo para la fila siguiente
+	dec c			;9507   ; Una fila menos
 	jr nz,L_94DE		;9508
 	ret			;950a
-L_950B:
-	ld a,00fh		;950b
-	ld (L_94B1+1),a		;950d
-	ld a,078h		;9510
+ANIMA_TOPO:		; Recorre secuencia_1 dibujando un trozo cada dos frames en la fila 15
+	ld a,00fh		;950b   ; Fila 15
+	ld (DIBUJA_TROZO+1),a		;950d   ; Parchea el `ld hl` de DIBUJA_TROZO: asi se le pasa la fila
+	ld a,078h		;9510   ; Columna 0x78, el caracter 15
 	ld (094e9h),a		;9512
-	xor a			;9515
+	xor a			;9515   ; Sin OR: cada trozo pisa al anterior
 	ld (l94f3h),a		;9516
-	ld hl,096b2h		;9519
+	ld hl,096b2h		;9519   ; La lista de trozos que se van alternando
 L_951C:
-	ld a,(hl)			;951c
+	ld a,(hl)			;951c   ; Numero de trozo; el 0xFF cierra la lista
 	cp 0ffh		;951d
 	ret z			;951f
-	ld (094bdh),a		;9520
+	ld (094bdh),a		;9520   ; Se lo parchea a DIBUJA_TROZO
 	push hl			;9523
 	ei			;9524
-	ld b,002h		;9525
+	ld b,002h		;9525   ; Dos frames entre trozo y trozo
 L_9527:
-	halt			;9527
+	halt			;9527   ; La espera
 	djnz L_9527		;9528
 	di			;952a
-	call L_94B1		;952b
+	call DIBUJA_TROZO		;952b   ; Y a dibujar
 	pop hl			;952e
-	inc hl			;952f
+	inc hl			;952f   ; Siguiente numero de la lista
 	jr L_951C		;9530
-L_9532:
-	ld a,007h		;9532
+ENTRA_TROZO_7:		; El trozo 7 aparece corriendose hacia la derecha
+	ld a,007h		;9532   ; El trozo 7, el mas ancho: nueve caracteres por once filas
 	ld (094bdh),a		;9534
-	ld a,006h		;9537
-	ld (L_94B1+1),a		;9539
-	ld a,000h		;953c
+	ld a,006h		;9537   ; A partir de la fila 6
+	ld (DIBUJA_TROZO+1),a		;9539
+	ld a,000h		;953c   ; Empezando por la columna 0
 L_953E:
-	cp 018h		;953e
+	cp 018h		;953e   ; Tres posiciones: columnas 0, 8 y 16
 	ret z			;9540
-	ld (094e9h),a		;9541
+	ld (094e9h),a		;9541   ; La columna, parcheada
 	push af			;9544
-	call L_94B1		;9545
+	call DIBUJA_TROZO		;9545
 	pop af			;9548
-	add a,008h		;9549
+	add a,008h		;9549   ; Un caracter mas a la derecha
 	jr L_953E		;954b
-L_954D:
-	ld a,009h		;954d
+ENTRA_TROZO_9:		; El trozo 9, al reves: entra de derecha a izquierda
+	ld a,009h		;954d   ; El trozo 9, seis caracteres por diez filas
 	ld (094bdh),a		;954f
-	ld a,007h		;9552
-	ld (L_94B1+1),a		;9554
-	ld a,090h		;9557
+	ld a,007h		;9552   ; En la fila 7
+	ld (DIBUJA_TROZO+1),a		;9554
+	ld a,090h		;9557   ; Este entra al reves: de la columna 0x90 a la 0x58
 L_9559:
-	cp 050h		;9559
+	cp 050h		;9559   ; Ocho posiciones, de derecha a izquierda
 	ret z			;955b
-	ld (094e9h),a		;955c
+	ld (094e9h),a		;955c   ; La columna, parcheada
 	push af			;955f
-	ei			;9560
+	ei			;9560   ; Un frame entre paso y paso
 	halt			;9561
 	di			;9562
-	call L_94B1		;9563
+	call DIBUJA_TROZO		;9563
 	pop af			;9566
-	sub 008h		;9567
+	sub 008h		;9567   ; Un caracter a la izquierda
 	jr L_9559		;9569
-L_956B:
-	ld a,0b6h		;956b
+ESTELA_TROZO_8:		; El trozo 8 dibujado en siete filas seguidas, superponiendose
+	ld a,0b6h		;956b   ; 0xB6 es `or (hl)`: a partir de aqui el trozo se superpone
 	ld (l94f3h),a		;956d
-	ld a,008h		;9570
+	ld a,008h		;9570   ; El trozo 8, cinco caracteres por siete filas
 	ld (094bdh),a		;9572
-	ld a,038h		;9575
+	ld a,038h		;9575   ; Columna 0x38, el caracter 7
 	ld (094e9h),a		;9577
-	ld a,000h		;957a
+	ld a,000h		;957a   ; Desde la fila 0
 L_957C:
-	cp 007h		;957c
+	cp 007h		;957c   ; El mismo trozo en las filas 0 a 6, una encima de otra
 	jr z,L_958B		;957e
-	ld (L_94B1+1),a		;9580
+	ld (DIBUJA_TROZO+1),a		;9580   ; La fila, parcheada
 	push af			;9583
-	call L_94B1		;9584
+	call DIBUJA_TROZO		;9584
 	pop af			;9587
-	inc a			;9588
+	inc a			;9588   ; Una fila mas abajo
 	jr L_957C		;9589
 L_958B:
-	jp L_94B1		;958b
-L_958E:
-	ld a,00ah		;958e
+	jp DIBUJA_TROZO		;958b   ; Lo dibuja una vez mas; como va superponiendo con OR, repetir no cambia nada
+VUELO_TROZO_10:		; El trozo 10 siguiendo el recorrido de 0x96CC
+	ld a,00ah		;958e   ; El trozo 10, siete caracteres por diez filas
 	ld (094bdh),a		;9590
-	ld hl,096cch		;9593
+	ld hl,096cch		;9593   ; El recorrido: parejas de columna y fila
 L_9596:
-	ld a,(hl)			;9596
+	ld a,(hl)			;9596   ; Columna; el 0xFF cierra el recorrido
 	cp 0ffh		;9597
 	jr z,L_95AB		;9599
 	inc hl			;959b
-	ld (094e9h),a		;959c
-	ld a,(hl)			;959f
+	ld (094e9h),a		;959c   ; Parchea la columna
+	ld a,(hl)			;959f   ; Y detras viene la fila
 	inc hl			;95a0
-	ld (L_94B1+1),a		;95a1
+	ld (DIBUJA_TROZO+1),a		;95a1
 	push hl			;95a4
-	call L_94B1		;95a5
+	call DIBUJA_TROZO		;95a5   ; Cada punto del recorrido, encima del anterior
 	pop hl			;95a8
 	jr L_9596		;95a9
 L_95AB:
-	jp L_94B1		;95ab
-L_95AE:
-	ld hl,096e9h		;95ae
+	jp DIBUJA_TROZO		;95ab   ; Una vez mas en el ultimo punto
+ULTIMA_SECUENCIA:		; Recorre secuencia_2 en la fila 13
+	ld hl,096e9h		;95ae   ; La segunda lista de trozos
 L_95B1:
-	ld a,(hl)			;95b1
+	ld a,(hl)			;95b1   ; Numero de trozo, hasta el 0xFF
 	cp 0ffh		;95b2
 	ret z			;95b4
 	push hl			;95b5
-	ld (094bdh),a		;95b6
-	ld a,0b0h		;95b9
+	ld (094bdh),a		;95b6   ; Parchea el trozo
+	ld a,0b0h		;95b9   ; Columna 0xB0, el caracter 22
 	ld (094e9h),a		;95bb
-	ld a,00dh		;95be
-	ld (L_94B1+1),a		;95c0
+	ld a,00dh		;95be   ; Fila 13
+	ld (DIBUJA_TROZO+1),a		;95c0
 	ei			;95c3
-	ld b,004h		;95c4
+	ld b,004h		;95c4   ; Cuatro frames entre trozo y trozo
 L_95C6:
-	halt			;95c6
+	halt			;95c6   ; La espera
 	djnz L_95C6		;95c7
 	di			;95c9
-	call L_94B1		;95ca
+	call DIBUJA_TROZO		;95ca   ; A dibujar
 	pop hl			;95cd
-	inc hl			;95ce
+	inc hl			;95ce   ; El siguiente de la lista
 	jr L_95B1		;95cf
-L_95D1:
-	di			;95d1
+TOPO_MAIN:		; Lo que hace el logo, de principio a fin
+	di			;95d1   ; Con la interrupcion parada: el logo se dibuja a mano
 	xor a			;95d2
-	ld (l94f3h),a		;95d3
-	call L_9602		;95d6
-	call L_9532		;95d9
-	call L_954D		;95dc
-	call L_9688		;95df
-	call L_956B		;95e2
-	call L_9688		;95e5
-	call L_958E		;95e8
-	call L_962B		;95eb
-	call L_9614		;95ee
-	call L_950B		;95f1
-	call L_950B		;95f4
-	call L_950B		;95f7
-	call topo_anima		;95fa
-	call L_95AE		;95fd
-	ei			;9600
+	ld (l94f3h),a		;95d3   ; Sin OR, de momento
+	call BORRA_COLOR		;95d6   ; Borra la tabla de colores
+	call ENTRA_TROZO_7		;95d9   ; Entran los dos trozos grandes, uno por cada lado
+	call ENTRA_TROZO_9		;95dc
+	call GUARDA_PANTALLA		;95df   ; Guarda la pantalla en RAM para poder superponer
+	call ESTELA_TROZO_8		;95e2   ; La estela vertical del trozo 8
+	call GUARDA_PANTALLA		;95e5   ; Vuelve a guardarla, ya con la estela
+	call VUELO_TROZO_10		;95e8   ; El trozo 10 recorriendo su trayectoria
+	call ABRE_COLOR		;95eb   ; Los colores se abren desde el centro
+	call PINTA_RECUADRO		;95ee   ; El recuadro de las dos filas de abajo
+	call ANIMA_TOPO		;95f1   ; Tres pasadas de la animacion
+	call ANIMA_TOPO		;95f4
+	call ANIMA_TOPO		;95f7
+	call CORRE_EL_COLOR		;95fa   ; El color corriendo por el recuadro
+	call ULTIMA_SECUENCIA		;95fd   ; Y la ultima lista de trozos
+	ei			;9600   ; Devuelve la interrupcion y vuelve al BASIC
 	ret			;9601
-L_9602:
-	ld hl,02000h		;9602
+BORRA_COLOR:		; Deja la tabla de colores entera en blanco sobre transparente
+	ld hl,02000h		;9602   ; Tabla de colores de SCREEN 2: 0x2000, 6144 bytes
 	ld bc,01800h		;9605
 L_9608:
-	ld a,0f0h		;9608
+	ld a,0f0h		;9608   ; 0xF0: blanco sobre transparente en todas las celdas
 	call 0004dh		;960a   ; BIOS WRTVRM - Writes data in VRAM
 	inc hl			;960d
 	dec bc			;960e
@@ -274,94 +274,94 @@ L_9608:
 	or c			;9610
 	jr nz,L_9608		;9611
 	ret			;9613
-L_9614:
-	ld hl,02f78h		;9614
-	ld a,081h		;9617
-	ld c,002h		;9619
+PINTA_RECUADRO:		; Rojo sobre negro en dos bandas de ocho caracteres, donde luego corre el color
+	ld hl,02f78h		;9614   ; 0x2F78: el color de la fila 15, caracter 15
+	ld a,081h		;9617   ; Rojo sobre negro
+	ld c,002h		;9619   ; Dos bandas
 L_961B:
-	ld b,040h		;961b
+	ld b,040h		;961b   ; Ocho caracteres cada una
 L_961D:
 	call 0004dh		;961d   ; BIOS WRTVRM - Writes data in VRAM
 	inc hl			;9620
 	djnz L_961D		;9621
-	ld de,000c0h		;9623
+	ld de,000c0h		;9623   ; 0x40 escritos mas 0xC0: la fila de caracteres siguiente
 	add hl,de			;9626
 	dec c			;9627
 	jr nz,L_961B		;9628
 	ret			;962a
-L_962B:
-	ld de,00008h		;962b
-	ld hl,02658h		;962e
+ABRE_COLOR:		; Va coloreando dos columnas que se separan desde el centro
+	ld de,00008h		;962b   ; Ocho bytes: lo que separa las dos columnas al empezar
+	ld hl,02658h		;962e   ; 0x2658: el color de la fila 6, caracter 11, el centro
 L_9631:
 	push hl			;9631
 	ld b,005h		;9632
 	push de			;9634
 L_9635:
-	ld a,071h		;9635
-	call L_967E		;9637
-	ld de,000f8h		;963a
+	ld a,071h		;9635   ; Cinco filas de cian sobre negro
+	call PINTA_CELDA_C		;9637
+	ld de,000f8h		;963a   ; Ocho escritos mas 0xF8 son 256: la fila de abajo
 	add hl,de			;963d
 	djnz L_9635		;963e
 	ld b,006h		;9640
 L_9642:
-	ld a,031h		;9642
-	call L_967E		;9644
-	add hl,de			;9647
+	ld a,031h		;9642   ; Y seis mas de verde sobre negro
+	call PINTA_CELDA_C		;9644
+	add hl,de			;9647   ; Otra vez 256 bytes mas alla
 	djnz L_9642		;9648
 	pop de			;964a
 	pop hl			;964b
 	push hl			;964c
-	add hl,de			;964d
+	add hl,de			;964d   ; La otra columna, a la distancia que toque
 	push de			;964e
 	ld b,005h		;964f
 L_9651:
-	ld a,071h		;9651
-	call L_967E		;9653
-	ld de,000f8h		;9656
+	ld a,071h		;9651   ; Los mismos cinco de cian
+	call PINTA_CELDA_C		;9653
+	ld de,000f8h		;9656   ; Y la fila de abajo
 	add hl,de			;9659
 	djnz L_9651		;965a
 	ld b,006h		;965c
 L_965E:
-	ld a,031h		;965e
-	call L_967E		;9660
-	add hl,de			;9663
+	ld a,031h		;965e   ; Los mismos seis de verde
+	call PINTA_CELDA_C		;9660
+	add hl,de			;9663   ; Fila de abajo
 	djnz L_965E		;9664
 	pop de			;9666
 	pop hl			;9667
-	ld a,e			;9668
+	ld a,e			;9668   ; Hasta que las dos columnas esten a 0x98 una de otra
 	cp 098h		;9669
 	ret z			;966b
 	ei			;966c
 	ld b,004h		;966d
 L_966F:
-	halt			;966f
+	halt			;966f   ; Cuatro frames por paso
 	djnz L_966F		;9670
 	di			;9672
-	add a,010h		;9673
+	add a,010h		;9673   ; La derecha, dos caracteres mas alla
 	ld e,a			;9675
 	push de			;9676
-	ld de,0fff8h		;9677
+	ld de,0fff8h		;9677   ; Y la izquierda, uno menos: se abren desde el centro
 	add hl,de			;967a
 	pop de			;967b
 	jr L_9631		;967c
-L_967E:
-	ld c,008h		;967e
+PINTA_CELDA_C:		; Igual que PINTA_CELDA pero contando con C
+	ld c,008h		;967e   ; Ocho bytes, un caracter
 L_9680:
 	call 0004dh		;9680   ; BIOS WRTVRM - Writes data in VRAM
 	inc hl			;9683
 	dec c			;9684
 	jr nz,L_9680		;9685
 	ret			;9687
-L_9688:
-	ld hl,00000h		;9688
-	ld de,0c000h		;968b
+GUARDA_PANTALLA:		; Copia la tabla de patrones de la VRAM a 0xC000, para poder superponer
+	ld hl,00000h		;9688   ; La tabla de patrones entera, 6144 bytes
+	ld de,0c000h		;968b   ; A 0xC000, que es justo la base de tabla_vram
 	ld bc,01800h		;968e
-	jp 00059h		;9691   ; BIOS LDIRMV - Block transfers to memory from VRAM
+	jp 00059h		;9691   ; BIOS LDIRMV - Block transfers to memory from VRAM | De ahi la lee el `or (hl)` de 0x94F3 para superponer sin borrar
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_trozos: Quince posiciones dentro de los dibujos de abajo, una
-;   por trozo del logo. El codigo indexa aqui para saber donde empieza cada
-;   uno
+;   por trozo del logo. El codigo indexa aqui (numero de trozo por dos) para
+;   saber donde empieza cada uno
 ;   0x9694..0x96b2  (30 bytes)
 DATA_tabla_trozos:
 	defb 000h,000h	; 9694
@@ -410,22 +410,29 @@ DATA_recorrido:
 	defb 0ffh	; 96e8
 
 ; ----------------------------------------------------------------------
-; DATOS secuencia_2: Segunda lista de numeros de dibujo, tambien cerrada con
-;   0xFF, y dos bytes de relleno
+; DATOS secuencia_2: Segunda lista de numeros de dibujo (11, 12, 13, 12, 11,
+;   12, 13 y 14), cerrada con 0xFF, y dos bytes de relleno. La recorre 0x95AE,
+;   cuatro frames por trozo, en la fila 13
 ;   0x96e9..0x96f4  (11 bytes)
 DATA_secuencia_2:
 	defb 00bh,00ch,00dh,00ch,00bh,00ch,00dh,00eh,0ffh,000h,000h	; 96e9  ...........
 
 ; ----------------------------------------------------------------------
-; DATOS punteros: Dos variables de trabajo de 16 bits que el propio codigo
-;   reescribe mientras anima
+; DATOS punteros: Dos variables de trabajo que DIBUJA_TROZO reescribe: 0x96F4
+;   por donde va leyendo el dibujo y 0x96F6 la entrada de tabla_vram por la
+;   que empezo. En la cinta vienen grabadas con 0xA50E y 0x9712, que son el
+;   final de los dibujos y la entrada 13 de tabla_vram: justo lo que dejan al
+;   dibujar el trozo 14 en la fila 13, el ultimo de secuencia_2
 ;   0x96f4..0x96f8  (4 bytes)
 DATA_punteros:
 	defw 0a50eh,09712h	; 96f4
 
 ; ----------------------------------------------------------------------
-; DATOS tabla_vram: Veinticuatro direcciones de memoria de video, de 0xC000 a
-;   0xD700 de 256 en 256: una por cada franja donde se va escribiendo el logo
+; DATOS tabla_vram: Las veinticuatro filas de caracter de la tabla de
+;   patrones, de 256 en 256 bytes. Van apuntadas a 0xC000-0xD700 y no a
+;   0x0000-0x1700 porque sirven para las dos cosas: tal cual son la copia que
+;   GUARDA_PANTALLA deja en RAM, y sin los bits 14 y 15 -que es lo que hace el
+;   bucle de 0x94F5- son la direccion de VRAM
 ;   0x96f8..0x9728  (48 bytes)
 DATA_tabla_vram:
 	defw 0c000h,0c100h,0c200h,0c300h,0c400h,0c500h,0c600h,0c700h	; 96f8
@@ -433,8 +440,14 @@ DATA_tabla_vram:
 	defw 0d000h,0d100h,0d200h,0d300h,0d400h,0d500h,0d600h,0d700h	; 9718
 
 ; ----------------------------------------------------------------------
-; DATOS dibujos_logo: Los 3558 bytes de los trozos del logo, en el orden al
-;   que apunta la tabla de arriba
+; DATOS dibujos_logo: Los quince trozos del logo, en el orden al que apunta
+;   tabla_trozos. Cada uno empieza por dos bytes de cabecera -ancho en bytes y
+;   filas de caracter- y detras van ancho*filas bytes de patrones. Sumados los
+;   quince dan 3558 bytes, que es exactamente lo que ocupa el bloque: del 0 al
+;   6, siete cuadros de 64x2 para la animacion; el 7 de 72x11 y el 9 de 48x10,
+;   que son los dos trozos grandes que entran por los lados; el 8 de 40x7, que
+;   deja la estela; el 10 de 56x10, el que hace el recorrido; y del 11 al 14,
+;   cuatro de 24x5 para la ultima secuencia
 ;   0x9728..0xa50e  (3558 bytes)
 DATA_dibujos_logo:
 	defb 040h,002h,000h,000h,000h,01fh,03fh,078h,070h,03fh,000h,000h,000h,0e0h,0f8h,03ch	; 9728  @.....?xp?.....<
